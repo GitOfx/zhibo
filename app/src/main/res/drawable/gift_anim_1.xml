@@ -41,44 +41,6 @@
         android:duration="150"
         android:drawable="@mipmap/gift_flower_10"/>
 
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_1"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_2"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_3"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_4"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_5"/>
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_6"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_7"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_8"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_9"/>
-
-    <item
-        android:duration="150"
-        android:drawable="@mipmap/gift_flower_10"/>
 
 
 </animation-list>

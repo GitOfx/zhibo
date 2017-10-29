@@ -52,5 +52,13 @@
     <color name="tv_xieyi_title">@color/textcolor_title</color>
     <color name="popup_bg">#e5000000</color>
 
+
+    <color name="color_00ba00">#00ba00</color>
+    <color name="color_61800e">#61800e</color>
+    <color name="color_f3dd1e">#f3dd1e</color>
+    <color name="color_d6c55a">#d6c55a</color>
+    <color name="color_ff0000">#ff0000</color>
+    <color name="color_0000CD">#0000CD</color>
+
 </resources>
 

@@ -54,6 +54,8 @@
         <item name="android:windowEnterAnimation">@anim/toast_enter</item>
         <item name="android:windowExitAnimation">@anim/toast_exit</item>
     </style>
+
+
     <style name="MyAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:layout_marginLeft">0dp</item>
         <item name="android:layout_marginRight">0dp</item>

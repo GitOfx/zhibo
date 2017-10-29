@@ -21,6 +21,15 @@ public class VideoItem  implements Serializable {
     private String need_password;
     private String minute_charge;
     private String play_url;
+    private String charge_type;
+
+    public String getCharge_type() {
+        return charge_type;
+    }
+
+    public void setCharge_type(String charge_type) {
+        this.charge_type = charge_type;
+    }
 
     public String getMinute_charge() {
         return minute_charge;

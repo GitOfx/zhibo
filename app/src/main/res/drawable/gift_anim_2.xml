@@ -41,7 +41,6 @@
         android:duration="150"
         android:drawable="@mipmap/gift_jiezhi_10"/>
 
-
     <item
         android:duration="150"
         android:drawable="@mipmap/gift_jiezhi_1"/>
@@ -80,7 +79,6 @@
     <item
         android:duration="150"
         android:drawable="@mipmap/gift_jiezhi_10"/>
-
 
 
 </animation-list>

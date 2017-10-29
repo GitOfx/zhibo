@@ -41,6 +41,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,6 +52,7 @@ import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -68,12 +70,11 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.ksyun.media.rtc.kit.KSYRtcStreamer;
 import com.ksyun.media.rtc.kit.RTCClient;
 import com.ksyun.media.rtc.kit.RTCConstants;
 import com.ksyun.media.streamer.capture.camera.CameraTouchHelper;
-import com.ksyun.media.streamer.filter.imgtex.ImgBeautyProFilter;
-import com.ksyun.media.streamer.filter.imgtex.ImgFilterBase;
 import com.ksyun.media.streamer.filter.imgtex.ImgTexFilterBase;
 import com.ksyun.media.streamer.filter.imgtex.ImgTexFilterMgt;
 import com.ksyun.media.streamer.kit.KSYStreamer;
@@ -82,6 +83,9 @@ import com.ksyun.media.streamer.kit.OnPreviewFrameListener;
 import com.ksyun.media.streamer.kit.StreamerConstants;
 import com.ksyun.media.streamer.logstats.StatsLogReport;
 import com.ksyun.media.streamer.util.audio.KSYBgmPlayer;
+import com.litesuits.common.assist.Check;
+import com.litesuits.common.assist.Toastor;
+import com.litesuits.common.utils.NumberUtil;
 import com.meetme.android.horizontallistview.HorizontalListView;
 import com.yiren.live.base.BaseActivity;
 import com.smart.androidutils.images.GlideCircleTransform;
@@ -94,9 +98,9 @@ import com.smart.loginsharesdk.share.ThirdShare;
 import com.smart.loginsharesdk.share.onekeyshare.Type;
 
 import cn.leancloud.chatkit.cache.LCIMConversationItemCache;
-import me.wcy.lrcview.LrcView;
 import com.yiren.live.LocationService;
 import com.yiren.live.MyApplication;
+import com.yiren.live.home.model.Start;
 import com.yiren.live.intf.OnCustomClickListener;
 import com.yiren.live.intf.OnRequestDataListener;
 import com.yiren.live.lean.Chat;
@@ -122,6 +126,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 
@@ -138,6 +143,7 @@ import cn.sharesdk.framework.Platform;
 import de.greenrobot.event.EventBus;
 import de.hdodenhof.circleimageview.CircleImageView;
 import com.yiren.live.R;
+import com.yiren.live.view.MyAlerDialogKaiJiang;
 
 public class PublishActivity extends BaseActivity implements AdapterView.OnItemClickListener, ActivityCompat.OnRequestPermissionsResultCallback,OnShareStatusListener {
 
@@ -145,18 +151,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     public List<GiftSendModel> giftSendModelList = new ArrayList<GiftSendModel>();
     public GiftSendModel mGiftSendModel1;
     public GiftSendModel mGiftSendModel2;
-    @Bind(R.id.sb_valume)
-    SeekBar mSbValume;
-    @Bind(R.id.yinxiao_container)
-    FrameLayout mYinxiaoContainer;
-    @Bind(R.id.sb_hongrun)
-    SeekBar mSbHongrun;
-    @Bind(R.id.sb_meibai)
-    SeekBar mSbMeibai;
-    @Bind(R.id.sb_mopi)
-    SeekBar mSbMopi;
-    @Bind(R.id.meiyan_container)
-    FrameLayout mMeiyanContainer;
     @Bind(R.id.add_living_location)
     TextView addLivingLocation;
     @Bind(R.id.gift_layout1)
@@ -164,7 +158,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     @Bind(R.id.gift_layout2)
     GiftFrameLayout giftFrameLayout2;
     @Bind(R.id.live_viewflipper)
-    FrameLayout mLiveViewFlipper;
+    ViewFlipper mLiveViewFlipper;
     DanmuAdapter mDanmuadapter;
     OnlineUserAdapter mOnlineUserAdapter;
     @Bind(R.id.live_share)
@@ -215,8 +209,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     FrameLayout mLiveTopLayer;
     @Bind(R.id.music_stop)
     TextView mMusicStop;
-    @Bind(R.id.music_value)
-    TextView mMusicValue;
     @Bind(R.id.live_gift_container)
     LinearLayout mLiveGiftContainer;
     @Bind(R.id.living_gift_big)
@@ -240,14 +232,8 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     LinearLayout mPublishMore;
     @Bind(R.id.text_topic)
     TextView mTextTopic;
-    @Bind(R.id.lrc_small)
-    LrcView mLrcSmall;
-    @Bind(R.id.shanguan_container)
-    FrameLayout mShanGuanContainer;
-    @Bind(R.id.publish_shop_icon)
-    ImageView mPublishShopIcon;
-    @Bind(R.id.publish_switch)
-    ImageView mPublishSwitch;
+    @Bind(R.id.check)
+    Button check;
     CircleImageView mDialogUserAvatar;
     TextView mDialogUserNicename;
     ImageView mDialogClose;
@@ -297,13 +283,11 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     private PopupWindow mPopupShareWindow;//类型选择
     private PopupWindow mPopupCaozuoWindow;//操作类型
     private String payMoney = "";
-    private String minute_charge = "";
     private String privacy = "0";
     private String pass = "";
     private String shopUrl = "";
     private ThirdShare mThirdShare;
     private LocationService locationService;
-    private LocationClient locationClient;
     private double mLatitude;
     private double mLongitude;
     private String mLocation;
@@ -312,7 +296,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     private boolean meiyan = false;
     private boolean slight = false;
     private GLSurfaceView mCameraPreviewView;
-    private CameraTouchHelper cameraTouchHelper;
     //private TextureView mCameraPreviewView;
     private CameraHintView mCameraHintView;
     private KSYRtcStreamer mStreamer;
@@ -354,6 +337,42 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     private final String RTC_UINIQUE_NAME = "apptest";
     @Bind(R.id.lianmai_stop)
     TextView mLianmaiStop;
+
+
+    @Bind(R.id.sunmit_onclick)
+    Button sunmit_onclick;
+
+    @Bind(R.id.confirm_button)
+    Button confirm_button;
+
+    @Bind(R.id.time)
+    TextView time;
+    @Bind(R.id.kaijiang_lin)
+    LinearLayout kaijiang_lin;
+    @Bind(R.id.x_text)
+    TextView x_text;
+    @Bind(R.id.xd_text)
+    TextView xd_text;
+    @Bind(R.id.h_text)
+    TextView h_text;
+    @Bind(R.id.z_text)
+    TextView z_text;
+    @Bind(R.id.zd_text)
+    TextView zd_text;
+
+    @Bind(R.id.time_text)
+    TextView time_text;
+    String type = "0";//0未开始，1已经开始，2停止下注，3 开奖
+
+    String stime = "";
+    String etime = "";
+    String finishTime = "";
+    Start start;
+    Gson gson = new Gson();
+
+    Toastor toastor;
+    GridView gridView;
+
     Runnable dataRunnable = new Runnable() {
         @Override
         public void run() {
@@ -366,10 +385,10 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     if (isActive) {
                         JSONObject data = data1.getJSONObject("data");
                         if (null != mLiveUserOnlineNum && null != mLiveUserTotal) {
-                            //mLiveUserTotal.setText(data.getString("total_earn"));
+                            mLiveUserTotal.setText(data.getString("total_earn"));
                             // mLiveUserOnlineNum.setText(onlineNum + "");
-                            //mLiveUserOnlineNum.setText(data.getString("online_num"));
-                            dataHandler.postDelayed(dataRunnable, 10000);
+                            mLiveUserOnlineNum.setText(data.getString("online_num"));
+                            dataHandler.postDelayed(dataRunnable, 2000);
                         }
                     }
                 }
@@ -393,7 +412,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                             toast(msg);
                             break;
                         default:
-                            dataHandler.postDelayed(dataRunnable, 10000);
+                            dataHandler.postDelayed(dataRunnable, 2000);
                             break;
                     }
 
@@ -405,6 +424,8 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     private String userId;//用户id
     private String channel_creater;//主播id
     private JSONArray sysMessage;
+    private float mLastX;
+    private float mLastY;
     private Boolean danmuChecked = false;
     private ArrayList<DanmuModel> lianmaiList;
     private KSYStreamer.OnInfoListener mOnInfoListener = new KSYStreamer.OnInfoListener() {
@@ -413,7 +434,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             switch (what) {
                 case StreamerConstants.KSY_STREAMER_CAMERA_INIT_DONE:
                     Log.d(TAG, "KSY_STREAMER_CAMERA_INIT_DONE");
-
                     break;
                 case StreamerConstants.KSY_STREAMER_OPEN_STREAM_SUCCESS:
                     Log.d(TAG, "KSY_STREAMER_OPEN_STREAM_SUCCESS");
@@ -421,7 +441,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     break;
                 case StreamerConstants.KSY_STREAMER_FRAME_SEND_SLOW:
                     Log.d(TAG, "KSY_STREAMER_FRAME_SEND_SLOW " + msg1 + "ms");
-                    toast("网络状态不好!");
+                    toast("Network not good!");
                     break;
                 case StreamerConstants.KSY_STREAMER_EST_BW_RAISE:
                     Log.d(TAG, "BW raise to " + msg1 / 1000 + "kbps");
@@ -517,9 +537,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                 @Override
                 public void onLogEvent(StringBuilder singleLogContent) {
                     Log.i(TAG, "***onLogEvent : " + singleLogContent.toString());
-                    if("fail".equals(JSON.parseObject(singleLogContent.toString()).getString("streaming_stat")) && null != liveInfo){
-                        toast("网络出现问题，请退出重试");
-                    }
                 }
             };
     private OnAudioRawDataListener mOnAudioRawDataListener = new OnAudioRawDataListener() {
@@ -538,80 +555,83 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         }
     };
     private long lastClickTime = 0;
-    private MyLocationListener mListener =  new MyLocationListener();
-    public class MyLocationListener implements BDLocationListener {
+    private BDLocationListener mListener = new BDLocationListener() {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
+            // TODO Auto-generated method stub
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
                 mLatitude = location.getLatitude();
                 mLongitude = location.getLongitude();
                 mLocation = location.getCountry() + "-" + location.getProvince() + "-" + location.getCity();
-                if(StringUtils.isNotEmpty(location.getCity()))
-                    addLivingLocation.setText(location.getCity());
-                if (null != locationClient) {
-                    locationClient.stop(); //停止定位服务
+                addLivingLocation.setText(location.getCity());
+                if (null != locationService) {
+                    locationService.stop(); //停止定位服务
                 }
 
             }
-
         }
-    }
 
-    private void pushCallBack(){
+    };
+    private JSONObject params;
+
+    private void pushCallBack() {
         JSONObject params = new JSONObject();
-        params.put("token",token);
-        params.put("action","push");
+        params.put("token", token);
+        params.put("action", "push");
         Api.pushCallback(this, params, new OnRequestDataListener() {
             @Override
             public void requestSuccess(int code, JSONObject data) {
-                initData();
+
             }
 
             @Override
             public void requestFailure(int code, String msg) {
-                initData();
+
             }
         });
     }
-    int radioId = 0 ;
-    @OnClick({R.id.radio_share_wechat_moment,R.id.radio_share_wechat,R.id.radio_share_sina,R.id.radio_share_qq,R.id.radio_share_zone} )
-    public void shareRadio(CheckBox v){
+
+    int radioId = 0;
+
+    @OnClick({R.id.radio_share_wechat_moment, R.id.radio_share_wechat, R.id.radio_share_sina, R.id.radio_share_qq, R.id.radio_share_zone})
+    public void shareRadio(CheckBox v) {
         radioId = 0;
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.radio_share_wechat:
-                if(v.isChecked()){
+                if (v.isChecked()) {
                     radioId = v.getId();
                     setCheckByid(v);
                 }
                 break;
             case R.id.radio_share_sina:
-                if(v.isChecked()){
+                if (v.isChecked()) {
                     radioId = v.getId();
                     setCheckByid(v);
                 }
                 break;
             case R.id.radio_share_qq:
-                if(v.isChecked()){
+                if (v.isChecked()) {
                     radioId = v.getId();
                     setCheckByid(v);
                 }
                 break;
             case R.id.radio_share_wechat_moment:
-                if(v.isChecked()){
+                if (v.isChecked()) {
                     radioId = v.getId();
                     setCheckByid(v);
                 }
                 break;
             case R.id.radio_share_zone:
-                if(v.isChecked()){
+                if (v.isChecked()) {
                     radioId = v.getId();
                     setCheckByid(v);
                 }
                 break;
         }
     }
-    private void setCheckByid(CheckBox c){
+
+    private void setCheckByid(CheckBox c) {
         mRadioShareWechatMoment.setChecked(false);
         mRadioShareWechat.setChecked(false);
         mRadioShareqq.setChecked(false);
@@ -619,15 +639,16 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         mRadioShareZone.setChecked(false);
         c.setChecked(true);
     }
-    JSONObject info ;
+
+    JSONObject info;
 
     @OnClick(R.id.btn_start_living)
-    public void btnStartLiveing(){
+    public void btnStartLiveing() {
         String title = mInputLiveTitle.getText().toString();
-//        if (StringUtils.isEmpty(title)) {
-//            toast("先输入一个标题吧");
-//            return;
-//        }
+        if (StringUtils.isEmpty(title)) {
+            toast("先输入一个标题吧");
+            return;
+        }
 
         if (mThirdShare != null && radioId != 0) {
             JSONObject params = new JSONObject();
@@ -692,21 +713,20 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     toast(msg);
                 }
             });
-        }else{
+        } else {
             startLive(title);
         }
     }
 
     @OnClick(R.id.lianmai_stop)
-    public void lianmaiStop(View v){
-        if(null != mStreamer){
-            if(mIsConnected){
-                mStreamer.getRtcClient().stopCall();
-            }
+    public void lianmaiStop(View v) {
+        if (null != mStreamer) {
+            mStreamer.getRtcClient().stopCall();
             v.setVisibility(View.GONE);
         }
     }
-    private void uploadLocation(){
+
+    private void uploadLocation() {
         if (!StringUtils.isEmpty(token)) {
             JSONObject params = new JSONObject();
             params.put("token", token);
@@ -731,10 +751,31 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
     @OnClick(R.id.publish_shop_icon)
     public void shop(View v) {
-        Bundle data1 = new Bundle();
-        data1.putString("jump",shopInfo.getString("url"));
-        data1.putString("title","");
-        openActivity(WebviewActivity.class,data1);
+        DialogEnsureUtiles.showInfo(PublishActivity.this, new OnCustomClickListener() {
+            @Override
+            public void onClick(String value) {
+                if (StringUtils.isEmpty(value)) {
+                    toast("请输入链接");
+                    return;
+                }
+                shopUrl = value;
+                JSONObject params = new JSONObject();
+                params.put("token", token);
+                params.put("room_id", liveInfo.getString("room_id"));
+                params.put("shop_url", value);
+                Api.setShopLink(PublishActivity.this, params, new OnRequestDataListener() {
+                    @Override
+                    public void requestSuccess(int code, JSONObject data) {
+                        toast(data.getString("descrp"));
+                    }
+
+                    @Override
+                    public void requestFailure(int code, String msg) {
+                        toast(msg);
+                    }
+                });
+            }
+        }, shopUrl, "请输入推广地址");
     }
 
     @OnClick(R.id.live_user_avatar)
@@ -747,60 +788,27 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
     @OnClick(R.id.text_topic)
     public void textTopic(View v) {
-        Intent it = new Intent(this,TopicActivity.class);
-        startActivityForResult(it,TOPIC_CODE);
+        Intent it = new Intent(this, TopicActivity.class);
+        startActivityForResult(it, TOPIC_CODE);
         //openActivity(TopicActivity.class);
     }
-    private void initLocation(){
-        LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-        //可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
 
-        option.setCoorType("bd09ll");
-        //可选，默认gcj02，设置返回的定位结果坐标系
-
-        int span=1000;
-        option.setScanSpan(span);
-        //可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
-
-        option.setIsNeedAddress(true);
-        //可选，设置是否需要地址信息，默认不需要
-
-        option.setOpenGps(true);
-        //可选，默认false,设置是否使用gps
-
-        option.setLocationNotify(true);
-        //可选，默认false，设置是否当GPS有效时按照1S/1次频率输出GPS结果
-
-        option.setIsNeedLocationDescribe(true);
-        //可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
-
-        option.setIsNeedLocationPoiList(true);
-        //可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
-
-        option.setIgnoreKillProcess(false);
-        //可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
-
-        option.SetIgnoreCacheException(false);
-        //可选，默认false，设置是否收集CRASH信息，默认收集
-
-        option.setEnableSimulateGps(false);
-        //可选，默认false，设置是否需要过滤GPS仿真结果，默认需要
-
-        locationClient.setLocOption(option);
-    }
     @OnClick(R.id.add_living_location)
     public void openLocation() {
         if (ifLocation) {
             addLivingLocation.setText("请稍后...");
-            locationClient = ((MyApplication) getApplication()).locationClient;
-            initLocation();
-            locationClient.registerLocationListener(mListener);
-            locationClient.start();
+            if (null == locationService) {
+                locationService = ((MyApplication) getApplication()).locationService;
+                //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+                locationService.registerListener(mListener);
+                //注册监听
+                locationService.setLocationOption(locationService.getDefaultLocationClientOption());
+            }
+            locationService.start();
         } else {
             addLivingLocation.setText("开启定位");
             mLongitude = 0;
-            locationClient.stop();
+            locationService.stop();
         }
 
         ifLocation = !ifLocation;
@@ -810,23 +818,13 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     public void danmuCheckChangerd(CompoundButton buttonView, boolean isChecked) {
         CheckBox temp = (CheckBox) buttonView;
         danmuChecked = temp.isChecked();
-//        if (danmuChecked) {
-//            mLiveEditInput.setHint("开启大喇叭，1金币/条");
-//        } else {
-            mLiveEditInput.setHint("我也要发言...");
-//        }
-    }
-    private Handler lycHandler = new Handler();
-    private Runnable lycRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (!bgm && isActive) {
-                long time = mStreamer.getAudioPlayerCapture().getBgmPlayer().getPosition();
-                mLrcSmall.updateTime(time);
-            }
-            lycHandler.postDelayed(this, 100);
+        if (danmuChecked) {
+            mLiveEditInput.setHint("开启大喇叭，1雪花/条");
+        } else {
+            mLiveEditInput.setHint("我也要给主播小主发言...");
         }
-    };
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // 结果码不等于取消时候
@@ -834,13 +832,12 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             switch (requestCode) {
                 case MUSIC_CODE:
                     mBgmPath = data.getStringExtra("path");
-                    if(StringUtils.isNotEmpty(mBgmPath)){
+                    if (StringUtils.isNotEmpty(mBgmPath)) {
                         mStreamer.getAudioPlayerCapture().getBgmPlayer()
                                 .setOnCompletionListener(new KSYBgmPlayer.OnCompletionListener() {
                                     @Override
                                     public void onCompletion(KSYBgmPlayer bgmPlayer) {
                                         Log.d(TAG, "End of the currently playing music");
-                                        mLrcSmall.setVisibility(View.GONE);
                                     }
                                 });
                         mStreamer.getAudioPlayerCapture().getBgmPlayer()
@@ -856,16 +853,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                         mStreamer.startBgm(mBgmPath, true);
                         mLiveMusic.setImageResource(R.drawable.bgm_on);
                         mMusicStop.setVisibility(View.VISIBLE);
-                        mMusicValue.setVisibility(View.VISIBLE);
-//                        File lyc = new File(mBgmPath.replace("mp3","lrc"));
-//                        if (lyc.exists()){
-//                            mLrcSmall.loadLrc(new File(mBgmPath));
-//                            lycHandler.post(lycRunnable);
-//                        }
-                        String aa = getLrcText1(mBgmPath);
-                        mLrcSmall.loadLrc(aa);
-                        lycHandler.post(lycRunnable);
-                        mLrcSmall.setVisibility(View.VISIBLE);
                     }
                     break;
                 case TOPIC_CODE:
@@ -878,66 +865,15 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private String getLrcText(String fileName) {
-        String lrcText = null;
-        try {
-            InputStream is = getAssets().open(fileName);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            lrcText = new String(buffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return lrcText;
-    }
-
-    private String getLrcText1(String fileName) {
-        String fileName1 = fileName.replace("mp3","lrc");
-        String lrcText = null;
-        try {
-            FileInputStream is = new FileInputStream(fileName1);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            lrcText = new String(buffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return lrcText;
-    }
 
     @OnClick(R.id.music_stop)
-    public void musicStop(){
-        if(null != mStreamer){
+    public void musicStop() {
+        if (null != mStreamer) {
             mStreamer.stopBgm();
             mMusicStop.setVisibility(View.GONE);
-            mMusicValue.setVisibility(View.GONE);
             mLiveMusic.setImageResource(R.drawable.bgm_off);
-            lycHandler.removeCallbacks(lycRunnable);
-            mLrcSmall.setVisibility(View.GONE);
-        }
-    }
-    //音效调节
-    @OnClick(R.id.music_value)
-    public void musicValue(){
-        if(mYinxiaoContainer.getVisibility() == View.VISIBLE){
-            mYinxiaoContainer.setVisibility(View.GONE);
-        }else {
-            mYinxiaoContainer.setVisibility(View.VISIBLE);
-        }
-    }
 
-    @OnClick(R.id.music_value_close)
-    public void musicValueClose(){
-        mYinxiaoContainer.setVisibility(View.GONE);
-    }
-    @OnClick(R.id.meiyan_value_close)
-
-    public void meiyanValueClose(){
-        mMeiyanContainer.setVisibility(View.GONE);
+        }
     }
 
     public void setBGM(String path) {
@@ -976,8 +912,9 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             ImageView imagePublic = (ImageView) inflate.findViewById(R.id.image_live_public);
             ImageView imagePass = (ImageView) inflate.findViewById(R.id.image_live_pass);
             ImageView imagePay = (ImageView) inflate.findViewById(R.id.image_live_pay);
+            ImageView image_live_vip = (ImageView) inflate.findViewById(R.id.image_live_vip);
+
             ImageView imagePrivate = (ImageView) inflate.findViewById(R.id.image_live_private);
-            ImageView imageMinute = (ImageView) inflate.findViewById(R.id.image_live_minute);
             TextView textView = (TextView) inflate.findViewById(R.id.tv_cancel);
             ClickListener clickListener = new ClickListener();
             textView.setOnClickListener(clickListener);
@@ -985,7 +922,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             imagePass.setOnClickListener(clickListener);
             imagePay.setOnClickListener(clickListener);
             imagePrivate.setOnClickListener(clickListener);
-            imageMinute.setOnClickListener(clickListener);
+            image_live_vip.setOnClickListener(clickListener);
         } else {
             mPopupShareWindow.showAtLocation(getWindow().getDecorView(), Gravity.BOTTOM, locX, locY);
         }
@@ -994,15 +931,18 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     @OnClick(R.id.live_music)
     public void livMusic(View view) {
         //openActivity(MusicActivity.class);
-        Intent i = new Intent(this,MusicActivity.class);
-        startActivityForResult(i,MUSIC_CODE);
+
+        Intent i = new Intent(this, MusicActivity.class);
+        startActivityForResult(i, MUSIC_CODE);
+        //  mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_REMOTE);
+
     }
 
     @OnClick(R.id.live_more)
-    public void liveMore(){
-        if(mPublishMore.getVisibility() == View.VISIBLE){
+    public void liveMore() {
+        if (mPublishMore.getVisibility() == View.VISIBLE) {
             mPublishMore.setVisibility(View.GONE);
-        }else {
+        } else {
             mPublishMore.setVisibility(View.VISIBLE);
         }
     }
@@ -1042,7 +982,9 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             }
         });
     }
+
     PopupWindow mPopupShareWindow1;
+
     @OnClick(R.id.my_share)
     public void mgShare() {
         int locX = 0;
@@ -1073,9 +1015,9 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
     @OnClick(R.id.live_sidou)
     public void showUserContribution() {
-        Bundle data = new Bundle();
-        data.putString("id", channel_creater);
-        openActivity(ContributionActivity.class, data);
+//        Bundle data = new Bundle();
+//        data.putString("id", channel_creater);
+//        openActivity(ContributionActivity.class, data);
     }
 
     public void showUserInfoDialogById(String uid) {
@@ -1132,14 +1074,14 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         mDialogUserAttention.setVisibility(View.VISIBLE);
         mDialogPrivateMessage.setVisibility(View.VISIBLE);
         //dialogChangkongImageOff.setImageResource(R.drawable.icon_changkong);
-       // dialogUserChangkong.setTextColor(Color.BLACK);
+        // dialogUserChangkong.setTextColor(Color.BLACK);
         if (uid.equals(channel_creater)) {
             //mUserDialogControlContainer.setVisibility(View.INVISIBLE);
             mDialogCaozuo.setVisibility(View.GONE);
             mDialogUserAttention.setVisibility(View.GONE);
             //mDialogUserMain.setVisibility(View.INVISIBLE);
             mDialogPrivateMessage.setVisibility(View.GONE);
-           // dialogUserChangkong.setVisibility(View.INVISIBLE);
+            // dialogUserChangkong.setVisibility(View.INVISIBLE);
 
         }
 //        mDialogUserAttention.setText("关注");
@@ -1158,26 +1100,23 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         Api.getUserContributionList(this, params, new OnRequestDataListener() {
             @Override
             public void requestSuccess(int code, JSONObject data) {
-                if(isActive){
-                    JSONArray list = data.getJSONArray("data");
-                    JSONObject item = list.getJSONObject(0);
-                    Glide.with(PublishActivity.this).load(item.getString("avatar"))
-                            .error(R.drawable.icon_avatar_default)
-                            .transform(new GlideCircleTransform(PublishActivity.this))
-                            .into(mDialogUserAvatarSmall);
-                }
-
+                JSONArray list = data.getJSONArray("data");
+                JSONObject item = list.getJSONObject(0);
+                Glide.with(PublishActivity.this).load(item.getString("avatar"))
+                        .error(R.drawable.icon_avatar_default)
+                        .transform(new GlideCircleTransform(PublishActivity.this))
+                        .into(mDialogUserAvatarSmall);
             }
 
             @Override
             public void requestFailure(int code, String msg) {
                 //toast(msg);
-                if(isActive){
-                    Glide.with(PublishActivity.this).load(R.drawable.icon_avatar_default).into(mDialogUserAvatarSmall);
-                }
+                Glide.with(PublishActivity.this).load(R.drawable.icon_avatar_default).into(mDialogUserAvatarSmall);
             }
         });
     }
+
+    JSONObject userInfo;
 
     public void getInfo(String token, String uid) {
         JSONObject params = new JSONObject();
@@ -1186,7 +1125,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         Api.getUserInfo(this, params, new OnRequestDataListener() {
             @Override
             public void requestSuccess(int code, JSONObject data) {
-                JSONObject userInfo = data.getJSONObject("data");
+                userInfo = data.getJSONObject("data");
                 Glide.with(PublishActivity.this).load(userInfo.getString("avatar"))
                         .error(R.drawable.icon_avatar_default)
                         .transform(new GlideCircleTransform(PublishActivity.this))
@@ -1240,59 +1179,23 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         });
     }
 
-    SeekBar.OnSeekBarChangeListener seekBarChangeListener =
-            new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress,
-                                              boolean fromUser) {
-
-                    if (!fromUser) {
-                        return;
-                    }
-                    float val = progress / 100.f;
-                    if (seekBar == mSbMopi) {
-                        filter.setGrindRatio(val);
-                    } else if (seekBar == mSbMeibai) {
-                        filter.setWhitenRatio(val);
-                    } else if (seekBar == mSbHongrun) {
-                        if (filter instanceof ImgBeautyProFilter) {
-                            val = progress / 50.f - 1.0f;
-                        }
-                        filter.setRuddyRatio(val);
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                }
-            };
-
     @OnClick({R.id.live_meiyan, R.id.dl_image_meiyan})
     public void meiyan(View view) {
-        if(mMeiyanContainer.getVisibility() == View.VISIBLE){
-            mMeiyanContainer.setVisibility(View.GONE);
-        }else {
-            mMeiyanContainer.setVisibility(View.VISIBLE);
+        meiyan = !meiyan;
+        if (meiyan) {
+            Drawable drawable_meiyan_off = PublishActivity.this.getResources().getDrawable(R.drawable.meiyan_on);
+            mLiveMeiyan.setImageDrawable(drawable_meiyan_off);
+            mStreamer.getImgTexFilterMgt().setFilter(mStreamer.getGLRender(),
+                    ImgTexFilterMgt.KSY_FILTER_BEAUTY_SKINWHITEN);
+            //BEAUTY_SKINWHITEN
+            mStreamer.setEnableImgBufBeauty(true);
+        } else {
+            Drawable drawable_meiyan_off = PublishActivity.this.getResources().getDrawable(R.drawable.meiyan_off);
+            mLiveMeiyan.setImageDrawable(drawable_meiyan_off);
+            mStreamer.getImgTexFilterMgt().setFilter(mStreamer.getGLRender(),
+                    ImgTexFilterMgt.KSY_FILTER_BEAUTY_DISABLE);
+            mStreamer.setEnableImgBufBeauty(false);
         }
-
-//        meiyan = !meiyan;
-//        if (meiyan) {
-//            Drawable drawable_meiyan_off = PublishActivity.this.getResources().getDrawable(R.drawable.meiyan_on);
-//            mLiveMeiyan.setImageDrawable(drawable_meiyan_off);
-//            mStreamer.getImgTexFilterMgt().setFilter(mStreamer.getGLRender(),
-//                    ImgTexFilterMgt.KSY_FILTER_BEAUTY_DENOISE);
-//            mStreamer.setEnableImgBufBeauty(true);
-//        } else {
-//            Drawable drawable_meiyan_off = PublishActivity.this.getResources().getDrawable(R.drawable.meiyan_off);
-//            mLiveMeiyan.setImageDrawable(drawable_meiyan_off);
-//            mStreamer.getImgTexFilterMgt().setFilter(mStreamer.getGLRender(),
-//                    ImgTexFilterMgt.KSY_FILTER_BEAUTY_DISABLE);
-//            mStreamer.setEnableImgBufBeauty(false);
-//        }
     }
 
     @OnClick(R.id.living_danmu_container)
@@ -1306,7 +1209,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         DialogEnsureUtiles.showConfirm(this, "确定退出直播间吗", new OnCustomClickListener() {
             @Override
             public void onClick(String value) {
-                if(mRecording){
+                if (mRecording) {
                     openActivity(PublishStopActivity.class);
                 }
                 PublishActivity.this.finish();
@@ -1331,58 +1234,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         openActivity(ConversationListActivity.class);
     }
 
-    @OnClick(R.id.publish_switch)
-    public void switchMode(){
-        DialogEnsureUtiles.showInfo(PublishActivity.this, new OnCustomClickListener() {
-            @Override
-            public void onClick(final String value) {
-                if (Utile.isNumeric(value)) {
-                    JSONObject params = new JSONObject();
-                    params.put("token", token);
-                    params.put("minute_charge", value);
-                    Api.doSwitchMode(PublishActivity.this, params, new OnRequestDataListener() {
-                        @Override
-                        public void requestSuccess(int code, JSONObject data) {
-                            if (code==200){
-                                JSONObject object=new JSONObject();
-                                object.put("minute_charge",value);
-                                DanmuModel model = new DanmuModel();
-                                model.setType("99");
-                                model.setUserName("系统消息");
-                                model.setContent("主播已开启飙车模式");
-                                model.setOther(object);
-                                model.setUserId(userId);
-                                model.setAvatar(avatar);
-                                mDanmuItems.add(model);
-                                mDanmuadapter.notifyDataSetChanged();
-                                mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
-                                AVIMTextMessage message = new AVIMTextMessage();
-                                message.setText(JSONObject.toJSONString(model));
-                                if (null != mSquareConversation) {
-                                    mSquareConversation.sendMessage(message, new AVIMConversationCallback() {
-                                        @Override
-                                        public void done(AVIMException e) {
-
-                                        }
-                                    });
-                                }
-                                mPublishSwitch.setVisibility(View.GONE);
-                            }
-                        }
-
-                        @Override
-                        public void requestFailure(int code, String msg) {
-                            toast(msg);
-                        }
-                    });
-                } else {
-                    toast("请输入整数");
-                }
-
-            }
-        }, minute_charge, "请输入整数(金币)");
-
-    }
     @OnClick({R.id.camera_reverse, R.id.dl_image_camera})
     public void cameraReverse() {
         new Thread(new Runnable() {
@@ -1461,16 +1312,14 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     }
 
     public void sendMessage(DanmuModel model) {
-        if (isActive && null != mDanmuItems) {
-            if(!"100".equals(model.getType()) && !"21".equals(model.getType()) && !"22".equals(model.getType())){
-                mDanmuItems.add(model);
-                mDanmuadapter.notifyDataSetChanged();
-                mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
-                mLiveEditInput.setText("");
-                mLiveBottomBtn.setVisibility(View.VISIBLE);
-                mLiveBottomSend.setVisibility(View.GONE);
-                SoftKeyboardUtils.closeSoftInputMethod(mLiveEditInput);
-            }
+        if (isActive) {
+            mDanmuItems.add(model);
+            mDanmuadapter.notifyDataSetChanged();
+            mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
+            mLiveEditInput.setText("");
+            mLiveBottomBtn.setVisibility(View.VISIBLE);
+            mLiveBottomSend.setVisibility(View.GONE);
+            SoftKeyboardUtils.closeSoftInputMethod(mLiveEditInput);
         }
         String message = JSONObject.toJSONString(model);
         EventBus.getDefault().post(
@@ -1499,7 +1348,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                if(isActive){
+                if (isActive) {
                     new Handler().post(new Runnable() {
                         @Override
                         public void run() {
@@ -1517,8 +1366,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         });
 
     }
-    List<ImgFilterBase> filters ;
-    ImgFilterBase filter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1545,7 +1393,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         mStreamer.setEncodeMethod(StreamerConstants.ENCODE_METHOD_SOFTWARE);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mStreamer.setDisplayPreview(mCameraPreviewView);
-        //mStreamer.setEnableStreamStatModule(true);
+        mStreamer.setEnableStreamStatModule(true);
         mStreamer.enableDebugLog(true);
         mStreamer.setFrontCameraMirror(true);
         mStreamer.setMuteAudio(false);
@@ -1556,8 +1404,8 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         //mStreamer.setOnAudioRawDataListener(mOnAudioRawDataListener);
         //mStreamer.setOnPreviewFrameListener(mOnPreviewFrameListener);
         mStreamer.getImgTexFilterMgt().setFilter(mStreamer.getGLRender(),
-                ImgTexFilterMgt.KSY_FILTER_BEAUTY_PRO);
-        //mStreamer.setEnableImgBufBeauty(true);
+                ImgTexFilterMgt.KSY_FILTER_BEAUTY_SKINWHITEN);
+//        mStreamer.setEnableImgBufBeauty(true);
         mStreamer.getImgTexFilterMgt().setOnErrorListener(new ImgTexFilterBase.OnErrorListener() {
             @Override
             public void onError(ImgTexFilterBase filter, int errno) {
@@ -1566,21 +1414,21 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                         ImgTexFilterMgt.KSY_FILTER_BEAUTY_DISABLE);
             }
         });
-        filters = mStreamer.getImgTexFilterMgt().getFilter();
-        filter = filters.get(0);
         // touch focus and zoom support
-        cameraTouchHelper = new CameraTouchHelper();
+        CameraTouchHelper cameraTouchHelper = new CameraTouchHelper();
         cameraTouchHelper.setCameraCapture(mStreamer.getCameraCapture());
         mCameraPreviewView.setOnTouchListener(cameraTouchHelper);
         // set CameraHintView to show focus rect and zoom ratio
         cameraTouchHelper.setCameraHintView(mCameraHintView);
-        //for rtc sub screen
-        cameraTouchHelper.addTouchListener(mRTCSubScreenTouchListener);
+
         //live end
 
         //set rtc info
+
+        //edit by sbdx
         mStreamer.getRtcClient().setRTCErrorListener(mRTCErrorListener);
         mStreamer.getRtcClient().setRTCEventListener(mRTCEventListener);
+
 //        mNetworkStateReceiver = new NetworkStateReceiver();
 //        mNetworkStateReceiver.addListener(new WeakReference<NetworkStateReceiver.NetworkStateReceiverListener>(this));
 //        IntentFilter intentFilter = new IntentFilter();
@@ -1591,6 +1439,9 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         //rtc
 
         mLiveGift.setVisibility(View.GONE);
+//        confirm_button.setVisibility(View.GONE);
+//        sunmit_onclick.setVisibility(View.VISIBLE);
+
         mLiveShare.setVisibility(View.GONE);
         mBtnFollow.setVisibility(View.GONE);
         mLiveTopLayer.setOnClickListener(new View.OnClickListener() {
@@ -1606,58 +1457,57 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
         mThirdShare = new ThirdShare(this);
         mThirdShare.setOnShareStatusListener(this);
-        mSbValume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
 
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                int ab = seekBar.getProgress();
-                float a =(float) ab/100;
-                mStreamer.getAudioPlayerCapture().getBgmPlayer().setVolume(a);
-            }
-        });
-        mSbHongrun.setOnSeekBarChangeListener(seekBarChangeListener);
-        mSbMeibai.setOnSeekBarChangeListener(seekBarChangeListener);
-        mSbMopi.setOnSeekBarChangeListener(seekBarChangeListener);
+        toastor = new Toastor(PublishActivity.this);
 
     }
-//    float x1 = 0;
-//    float x2 = 0;
-//    float y1 = 0;
-//    float y2 = 0;
-//
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-//            x1 = event.getX();
-//            y1 = event.getY();
-//        }
-//        if(event.getAction() == MotionEvent.ACTION_UP) {
-//            //当手指离开的时候
-//            x2 = event.getX();
-//            y2 = event.getY();
-//            if(y1 - y2 > 50) {
-//
-//            } else if(y2 - y1 > 50) {
-//
-//            } else if(x1 - x2 > 50) {
-//                mLiveViewFlipper.setVisibility(View.VISIBLE);
-//
-//            } else if(x2 - x1 > 50) {
-//                mLiveViewFlipper.setVisibility(View.GONE);
-//            }
-//        }
-//        return super.onTouchEvent(event);
-//    }
 
-    JSONObject shopInfo;
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mLastX = ev.getRawX();
+                mLastY = ev.getRawY();
+                break;
+            case MotionEvent.ACTION_MOVE: {
+                float mX = ev.getRawX();
+                float mY = ev.getRawY();
+                float disX = Math.abs(mX - mLastX);
+                float disY = Math.abs(mY - mLastY);
+                if (disY > disX) {
+                    return super.dispatchTouchEvent(ev);
+                }
+            }
+            break;
+            case MotionEvent.ACTION_UP: {
+                float mX = ev.getRawX();
+                float mY = ev.getRawY();
+                float disX = Math.abs(mX - mLastX);
+                float disY = Math.abs(mY - mLastY);
+                if (!mLiveOnlineUsers.isHasScroll()) {
+                    if (disX > 100 && disX > disY) {
+                        if (mX - mLastX > 0) {
+                            //向右滑动
+                            mLiveViewFlipper.setInAnimation(this, R.anim.in_leftright);
+                            mLiveViewFlipper.setOutAnimation(this, R.anim.out_leftright);
+                            mLiveViewFlipper.showNext();
+                        } else {
+                            //向左滑动
+                            mLiveViewFlipper.setInAnimation(this, R.anim.in_rightleft);
+                            mLiveViewFlipper.setOutAnimation(this, R.anim.out_rightleft);
+                            mLiveViewFlipper.showPrevious();
+                        }
+                        return super.dispatchTouchEvent(ev);
+                    }
+                }
+                mLiveOnlineUsers.setHasScroll(false);
+            }
+            break;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     private void initData() {
         mDanmuItems = new ArrayList<DanmuModel>();
         mUserItems = new ArrayList<UserModel>();
@@ -1691,26 +1541,26 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             Api.getUserInfo(this, requestParams, new OnRequestDataListener() {
                 @Override
                 public void requestSuccess(int code, JSONObject data) {
-                    if (isActive){
-                        JSONObject userInfo = data.getJSONObject("data");
-                        mLiveUserNicename.setText(userInfo.getString("user_nicename"));
-                        mLiveUserId.setText("ID:" + userInfo.getString("id"));
-                        channel_creater = userInfo.getString("id");
-                        mLiveUserTotal.setText(userInfo.getString("sidou"));
-                        Glide.with(PublishActivity.this).load(userInfo.getString("avatar"))
-                                .error(R.drawable.icon_avatar_default)
-                                .transform(new GlideCircleTransform(PublishActivity.this))
-                                .into(mLiveUserAvatar);
-                        getOnlineUsers();
-                        mLiveUserAvatar.setTag(R.id.image_live_avatar, userInfo.getString("id"));
-                        dataHandler.post(dataRunnable);
-                        dataHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                onRTCRegisterClick();
-                            }
-                        },3000);
-                    }
+                    JSONObject userInfo = data.getJSONObject("data");
+                    mLiveUserNicename.setText(userInfo.getString("user_nicename"));
+                    mLiveUserId.setText("ID:" + userInfo.getString("id"));
+                    channel_creater = userInfo.getString("id");
+                    mLiveUserTotal.setText(userInfo.getString("sidou"));
+                    Glide.with(PublishActivity.this).load(userInfo.getString("avatar"))
+                            .error(R.drawable.icon_avatar_default)
+                            .transform(new GlideCircleTransform(PublishActivity.this))
+                            .into(mLiveUserAvatar);
+
+                    mLiveUserAvatar.setTag(R.id.image_live_avatar, userInfo.getString("id"));
+                    dataHandler.postDelayed(dataRunnable, 2000);
+
+                    dataHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            onRTCRegisterClick();
+                        }
+                    }, 3000);
+
                 }
 
                 @Override
@@ -1738,66 +1588,64 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
             }
         });
-        mPublishSwitch.setVisibility(View.VISIBLE);
-//        Api.getShop(this, new JSONObject(), new OnRequestDataListener() {
-//            @Override
-//            public void requestSuccess(int code, JSONObject data) {
-//                shopInfo = data.getJSONObject("data");
-//                if(StringUtils.isNotEmpty(shopInfo.getString("imgurl"))){
-//                    mPublishShopIcon.setVisibility(View.VISIBLE);
-//                    Glide.with(PublishActivity.this).load(shopInfo.getString("imgurl"))
-//                            .error(R.drawable.icon_avatar_default)
-//                            .into(mPublishShopIcon);
-//                }
-//            }
-//
-//            @Override
-//            public void requestFailure(int code, String msg) {
-//
-//            }
-//        });
-
     }
 
-    private void startLive(String title){
+    private void startLive(String title) {
         JSONObject params = new JSONObject();
-        params.put("token",token);
+        params.put("token", token);
         params.put("title", title);
-        params.put("term_id","1");
-        if(null == mTextTopic.getTag()){
-            params.put("term_id","1");
-        }else{
-            params.put("term_id",mTextTopic.getTag());
+        params.put("term_id", "1");
+        if (null == mTextTopic.getTag()) {
+            params.put("term_id", "1");
+        } else {
+            params.put("term_id", mTextTopic.getTag());
         }
 
-        params.put("price",payMoney);
-        params.put("privacy",privacy);
-        params.put("room_password",pass);
-        params.put("minute_charge",minute_charge);
+        params.put("price", payMoney);
+        params.put("privacy", privacy);
+        params.put("room_password", pass);
+        params.put("charge_type", charge_type);
+        System.out.println("-->" + params.toString());
         Api.startLive(this, params, new OnRequestDataListener() {
             @Override
             public void requestSuccess(int code, JSONObject data) {
-                if(isActive){
-                    mAddLiving.setVisibility(View.GONE);
-                    mLiveViewFlipper.setVisibility(View.VISIBLE);
-                    liveInfo = data.getJSONObject("data");
-                    sysMessage = data.getJSONArray("msg");
-                    if (liveInfo != null) {
-                        mStreamer.setUrl(liveInfo.getString("push_rtmp"));
-                        startStream();
-                        uploadLocation();
-                    } else {
-                        toast("数据异常");
-                    }
+                System.out.println("++>" + data.toJSONString());
+                mAddLiving.setVisibility(View.GONE);
+                mLiveViewFlipper.setVisibility(View.VISIBLE);
+                liveInfo = data.getJSONObject("data");
+                sysMessage = data.getJSONArray("msg");
+
+                if ("8".equals(charge_type)) {
+                    sunmit_onclick.setVisibility(View.VISIBLE);
+                } else {
+                    sunmit_onclick.setVisibility(View.GONE);
+
+                }
+                if (liveInfo != null) {
+                    initData();
+                    mStreamer.setUrl(liveInfo.getString("push_rtmp"));
+                    startStream();
+                    uploadLocation();
+                    mMainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            getOnlineUsers();
+                        }
+                    }, 2000);
+
+
+                } else {
+                    toast("数据异常");
                 }
 
             }
 
             @Override
             public void requestFailure(int code, String msg) {
-                if(508 == code){
+                System.out.println(code + "--" + msg);
+                if (508 == code) {
                     openActivity(AuthorizeActivity.class);
-                }else{
+                } else {
                     toast(msg);
                 }
             }
@@ -1819,10 +1667,8 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     user.setUser_nicename(users.getJSONObject(i).getString("user_nicename"));
                     user.setLevel(users.getJSONObject(i).getString("user_level"));
                     mUserItems.add(user);
-                    Collections.sort(mUserItems);
                     mOnlineUserAdapter.notifyDataSetChanged();
                 }
-                mLiveUserOnlineNum.setText(mUserItems.size()+"");
             }
 
             @Override
@@ -1850,7 +1696,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         if (false) {
             showWaterMark();
         }
-        if(null != mSquareConversation){
+        if (null != mSquareConversation) {
             DanmuModel model = new DanmuModel();
             model.setType("6");
             model.setUserName("系统消息");
@@ -1874,7 +1720,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         EventBus.getDefault().unregister(this);
         mStreamer.onPause();
         DanmuModel model = new DanmuModel();
-        model.setType("5");
+        model.setType("6");
         model.setUserName("系统消息");
         model.setAvatar(avatar);
         model.setUserId(userId);
@@ -1899,9 +1745,9 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
     @Override
     protected void onStop() {
-        if (null != locationClient) {
-            locationClient.unRegisterLocationListener(mListener);
-            locationClient.stop(); //停止定位服务
+        if (null != locationService) {
+            locationService.unregisterListener(mListener); //注销掉监听
+            locationService.stop(); //停止定位服务
         }
         super.onStop();
     }
@@ -1947,22 +1793,11 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             model.setContent(temp.getString("content"));
             model.setUserId(temp.getString("userId"));
             model.setAvatar(temp.getString("avatar"));
+            System.out.println("主播端"+model.toString());
 
-            //设置金额显示
-            if(null != temp.getJSONObject("other")){
-                JSONObject in = temp.getJSONObject("other");
-                if(null != in.getString("totalEarn")){
-                    mLiveUserTotal.setText(in.getString("totalEarn"));
-                }
-            }
-
-            //拒绝连麦处理，离开
-            if(!"101".equals(model.getType()) && !"5".equals(model.getType())){
-                mDanmuItems.add(model);
-                mDanmuadapter.notifyDataSetChanged();
-                mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
-            }
-
+            mDanmuItems.add(model);
+            mDanmuadapter.notifyDataSetChanged();
+            mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
             switch (model.getType()) {
                 case "4":
                     //clickHeart();
@@ -1995,12 +1830,9 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     user.setAvatar(model.getAvatar());
                     user.setId(model.getUserId());
                     user.setUser_nicename(model.getUserName());
-                    user.setLevel(model.getUserLevel());
                     mUserItems.add(user);
-                    Collections.sort(mUserItems);
                     mOnlineUserAdapter.notifyDataSetChanged();
-                    mLiveUserOnlineNum.setText(mUserItems.size()+"");
-                   // showShanguangAnim(model);
+                    onlineNum++;
                     break;
                 case "2":
                     //toast("显示礼物画面");
@@ -2020,61 +1852,23 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     utemp.setId(model.getUserId());
                     mUserItems.remove(utemp);
                     mOnlineUserAdapter.notifyDataSetChanged();
-                    mLiveUserOnlineNum.setText(mUserItems.size()+"");
-                    break;
-                case "101":
-                    //拒绝连麦邀请
-                    mLianmaiStop.setVisibility(View.GONE);
-                    toast("对方拒绝了连麦邀请");
+                    onlineNum--;
                     break;
             }
         }
     }
 
-    private void showShanguangAnim(DanmuModel danmu){
-        final View giftPop = View.inflate(this, R.layout.shangguan, null);
-        TextView name = (TextView) giftPop.findViewById(R.id.enter_room_name);
-        TextView textview_user_level = (TextView)giftPop.findViewById(R.id.danmu_text_user_level);
-
-        int level = Integer.parseInt(danmu.getUserLevel());
-        FunctionUtile.setLevel(this,textview_user_level,level);
-//        if(level<5){
-//            textview_user_level.setBackgroundResource(R.drawable.level1);
-//        }
-//        if(level>4 && level<9 ){
-//            textview_user_level.setBackgroundResource(R.drawable.level2);
-//        }
-//        if(level>8 && level<13 ){
-//            textview_user_level.setBackgroundResource(R.drawable.level3);
-//        }
-//        if(level>12 ){
-//            textview_user_level.setBackgroundResource(R.drawable.level3);
-//        }
-        textview_user_level.setText(danmu.getUserLevel());
-        name.setText("金光一闪,"+danmu.getContent());
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.in_leftright);
-        giftPop.startAnimation(anim);
-        mShanGuanContainer.addView(giftPop);
-        Runnable giftTimer = new Runnable() {
-            @Override
-            public void run() {
-                mShanGuanContainer.removeView(giftPop);
-            }
-        };
-        giftPop.postDelayed(giftTimer, 2000);
-    }
-
-    private void getUnread(){
+    private void getUnread() {
         int num = 0;
         List<String> convIdList = LCIMConversationItemCache.getInstance().getSortedConversationList();
-        for (String id :convIdList){
+        for (String id : convIdList) {
             AVIMConversation conversation = LCChatKit.getInstance().getClient().getConversation(id);
-            if(conversation.getMembers().size() != 2)
+            if (conversation.getMembers().size() != 2)
                 continue;
             num += LCIMConversationItemCache.getInstance().getUnreadCount(conversation.getConversationId());
         }
         mImageOwnUnread.setVisibility(View.GONE);
-        if(num > 0){
+        if (num > 0) {
             mImageOwnUnread.setVisibility(View.VISIBLE);
         }
     }
@@ -2082,33 +1876,37 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
     public void starGiftAnimation(GiftSendModel model) {
         LogUtils.i("delong", model.getGiftCount() + "");
         switch (model.getGift_id()) {
-//            case "1"://钱包
-//                showBigAnim("gift_anim_wallet", model);
-//                break;
-//            case "2"://蛋糕
-//                showBigAnim("gift_anim_dangao", model);
-//                break;
-            case "4"://钻戒
+            case "40"://钱包
+                showBigAnim("gift_anim_5", model);
+                break;
+            case "13"://钻戒
+                showBigAnim("gift_anim_2", model);
+                break;
+            case "48"://蛋糕
+                showBigAnim("gift_anim_3", model);
+                break;
+            case "46"://跑车
+                showBigAnim("gift_anim_4", model);
+                break;
+            case "1"://钻戒
                 showBigAnim("gift_anim_jiezhi", model);
                 break;
-            case "8"://跑车
-                showBigAnim("gift_anim_car", model);
+
+            case "2"://岛屿
+                showBigAnim("gift_anim_haidao", model);
                 break;
-//            case "9"://岛屿
-//                showBigAnim("gift_anim_haidao", model);
-//                break;
-//            case "12"://飞机
-//                showBigAnim("gift_anim_feiji", model);
-//                break;
-            case "13"://鲜花
+            case "3"://飞机
+                showBigAnim("gift_anim_feiji", model);
+                break;
+            case "4"://鲜花
                 showBigAnim("gift_anim_flower", model);
                 break;
-//            case "21"://城堡
-//                showBigAnim("gift_anim_chengbao", model);
-//                break;
-//            case "22"://求婚
-//                showBigAnim("gift_anim_qiuhun", model);
-//                break;
+            case "5"://城堡
+                showBigAnim("gift_anim_chengbao", model);
+                break;
+            case "6"://求婚
+                showBigAnim("gift_anim_qiuhun", model);
+                break;
         }
         // layout1正在显示你的礼物动画//并且gift num  大于当前的num
         if (giftFrameLayout1.isShowing()) {
@@ -2160,35 +1958,42 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
             mLivingGiftBig.setVisibility(View.VISIBLE);
             mLivingGiftBig.setBackground(null);
             switch (anim) {
-                case "gift_anim_wallet":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_wallet));
+                case "gift_anim_5":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_5);
+                    break;
+                case "gift_anim_2":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_2);
+                    break;
+                case "gift_anim_3":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_3);
+                    break;
+                case "gift_anim_4":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_4);
+                    break;
+
+                case "gift_anim_jiezhi":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_jiezhi);
                     break;
                 case "gift_anim_haidao":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_haidao));
-                    break;
-                case "gift_anim_chengbao":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_chengbao));
-                    break;
-                case "gift_anim_qiuhun":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_qiuhun));
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_haidao);
                     break;
                 case "gift_anim_feiji":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_feiji));
-                    break;
-                case "gift_anim_jiezhi":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_jiezhi));
-                    break;
-                case "gift_anim_dangao":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_dangao));
-                    break;
-                case "gift_anim_car":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_car));
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_feiji);
                     break;
                 case "gift_anim_flower":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_flower));
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_flower);
                     break;
+                case "gift_anim_chengbao":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_chengbao);
+                    break;
+                case "gift_anim_qiuhun":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_qiuhun);
+                    break;
+
+
+
             }
-            AnimationDrawable animTemp = (AnimationDrawable) mLivingGiftBig.getDrawable();
+            AnimationDrawable animTemp = (AnimationDrawable) mLivingGiftBig.getBackground();
             animTemp.start();
             int duration = 0;
             for (int i = 0; i < animTemp.getNumberOfFrames(); i++) {
@@ -2335,67 +2140,11 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
     }
 
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        switch (ev.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                mLastX = ev.getRawX();
-//                mLastY = ev.getRawY();
-//                break;
-//            case MotionEvent.ACTION_MOVE: {
-//                float mX = ev.getRawX();
-//                float mY = ev.getRawY();
-//                float disX = Math.abs(mX - mLastX);
-//                float disY = Math.abs(mY - mLastY);
-//                if (disY > disX) {
-//                    return super.dispatchTouchEvent(ev);
-//                }
-//            }
-//            break;
-//            case MotionEvent.ACTION_UP: {
-//                float mX = ev.getRawX();
-//                float mY = ev.getRawY();
-//                float disX = Math.abs(mX - mLastX);
-//                float disY = Math.abs(mY - mLastY);
-//                if (!mLiveOnlineUsers.isHasScroll() ) {
-//                    if (disX > 100 && disX > disY) {
-//                        if (mX - mLastX > 0) {
-//                            //向右滑动
-//                            mLiveTopLayer.setVisibility(View.GONE);
-//                        } else {
-//                            //向左滑动
-//                            mLiveTopLayer.setVisibility(View.VISIBLE);
-//                        }
-//                        return super.dispatchTouchEvent(ev);
-//                    }
-//                }
-//                mLiveOnlineUsers.setHasScroll(false);
-//            }
-//            break;
-//        }
-//        return super.dispatchTouchEvent(ev);
-//    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        lycHandler.removeCallbacks(lycRunnable);
         dataHandler.removeCallbacks(dataRunnable);
-        DanmuModel model = new DanmuModel();
-        model.setType("20");
-        model.setUserName("系统消息");
-        model.setAvatar(avatar);
-        model.setUserId(userId);
-        model.setContent(user_nicename + "结束直播");
-        AVIMTextMessage message = new AVIMTextMessage();
-        message.setText(JSONObject.toJSONString(model));
         if (null != mSquareConversation) {
-            mSquareConversation.sendMessage(message, new AVIMConversationCallback() {
-                @Override
-                public void done(AVIMException e) {
-
-                }
-            });
             mSquareConversation.quit(new AVIMConversationCallback() {
                 @Override
                 public void done(AVIMException e) {
@@ -2403,7 +2152,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                 }
             });
         }
-        cameraTouchHelper.removeAllTouchListener();
         if (mIsConnected) {
             mStreamer.getRtcClient().stopCall();
         }
@@ -2419,7 +2167,13 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         if (mTimer != null) {
             mTimer.cancel();
         }
+        mStreamer.setOnLogEventListener(null);
+
         mStreamer.release();
+
+        mHandler.removeCallbacksAndMessages(null);
+
+
     }
 
     private void startStream() {
@@ -2469,7 +2223,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                 audioPerm != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 Log.e(TAG, "No CAMERA or AudioRecord permission, please check");
-                Toast.makeText(this, "应用需要相机或录音的权限",
+                Toast.makeText(this, "No CAMERA or AudioRecord permission, please check",
                         Toast.LENGTH_LONG).show();
             } else {
                 String[] permissions = {Manifest.permission.CAMERA,
@@ -2494,7 +2248,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     mStreamer.startCameraPreview();
                 } else {
                     Log.e(TAG, "No CAMERA or AudioRecord permission");
-                    Toast.makeText(this, "应用需要相机或录音的权限",
+                    Toast.makeText(this, "No CAMERA or AudioRecord permission",
                             Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -2510,8 +2264,11 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     @Override
                     public void onClick(String value) {
                         //finish();
-                        if(mRecording){
+                        if (mRecording) {
+                            mHandler.removeCallbacksAndMessages(null);
+
                             openActivity(PublishStopActivity.class);
+
                         }
                         PublishActivity.this.finish();
                     }
@@ -2646,6 +2403,15 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                         mPopupCaozuoWindow.setFocusable(true);
                         mPopupCaozuoWindow.setAnimationStyle(R.anim.bottom_in);
                         mPopupCaozuoWindow.showAtLocation(getWindow().getDecorView(), Gravity.BOTTOM, locX, locY);
+                        LinearLayout lianmai_container = (LinearLayout) inflate.findViewById(R.id.lianmai_container);
+
+//                        if ("8".equals(charge_type)) {
+//                            lianmai_container.setVisibility(View.INVISIBLE);
+//                        } else {
+//                            lianmai_container.setVisibility(View.VISIBLE);
+//
+//                        }
+
                         ImageView imageLianmai = (ImageView) inflate.findViewById(R.id.image_live_lianmai);
                         ImageView imageChangkong = (ImageView) inflate.findViewById(R.id.image_live_changkong);
                         ImageView imageJinyan = (ImageView) inflate.findViewById(R.id.image_live_jinyan);
@@ -2822,8 +2588,9 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                 case R.id.image_live_public:
                     pass = "";
                     payMoney = "";
+                    charge_type = "0";
+
                     privacy = "0";
-                    minute_charge="";
                     mAddLivingType.setText(getText(R.string.live_type_pub));
                     mPopupShareWindow.dismiss();
                     break;
@@ -2833,14 +2600,16 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                         public void onClick(String value) {
                             pass = value;
                             payMoney = "";
+                            charge_type = "0";
+
                             privacy = "0";
-                            minute_charge="";
                             mAddLivingType.setText(getText(R.string.live_type_pass));
                             mPopupShareWindow.dismiss();
                         }
                     }, pass, "请输入密码");
                     break;
                 case R.id.image_live_pay:
+
                     DialogEnsureUtiles.showInfo(PublishActivity.this, new OnCustomClickListener() {
                         @Override
                         public void onClick(String value) {
@@ -2848,65 +2617,53 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                                 payMoney = value;
                                 pass = "";
                                 privacy = "0";
-                                minute_charge="";
-                                mAddLivingType.setText(getText(R.string.live_type_pay));
+                                charge_type = "1";
+
+                                mAddLivingType.setText("VIP");
                                 mPopupShareWindow.dismiss();
                             } else {
                                 toast("请输入整数");
                             }
 
                         }
-                    }, payMoney, "请输入整数(金币)");
+                    }, payMoney, "请输入整数(钻石)");
                     break;
-                case R.id.image_live_private:
-                    privacy = "1";
+
+                case R.id.image_live_vip:
+
+                    charge_type = "8";
                     pass = "";
                     payMoney = "";
-                    minute_charge="";
+                    privacy = "0";
+                    mAddLivingType.setText("百家乐");
+                    mPopupShareWindow.dismiss();
+                    break;
+
+
+                case R.id.image_live_private:
+                    privacy = "1";
+                    charge_type = "0";
+
+                    pass = "";
+                    payMoney = "";
                     mAddLivingType.setText(getText(R.string.live_type_private));
                     mPopupShareWindow.dismiss();
                     break;
-                case R.id.image_live_minute:
-                    DialogEnsureUtiles.showInfo(PublishActivity.this, new OnCustomClickListener() {
-                        @Override
-                        public void onClick(String value) {
-                            if (Utile.isNumeric(value)) {
-                                minute_charge = value;
-                                payMoney = "";
-                                pass = "";
-                                privacy = "0";
-                                mAddLivingType.setText(getText(R.string.live_type_minute));
-                                mPopupShareWindow.dismiss();
-                            } else {
-                                toast("请输入整数");
-                            }
-
-                        }
-                    }, minute_charge, "请输入整数(金币)");
-                    break;
                 case R.id.image_live_lianmai:
-                    if ( mIsRegisted) {
-                        if(mIsConnected){
-                            toast("只能与一人连麦");
-                            break;
-                        }
-                        //mStreamer.getRtcClient().startCall(otherUserId);
-                        //mLianmaiStop.setText("邀请连麦中...");
+                    if (Integer.parseInt(userInfo.getString("user_level")) < 17) {
+                        toast("大于17级方可连麦");
+                        return;
+                    }
+
+                    if (mIsRegisted) {
+                        System.out.print(otherUserId+"--otherUserId");
+                        mStreamer.getRtcClient().startCall(otherUserId);
+
+                        mLianmaiStop.setText("连麦中...");
                         mLianmaiStop.setVisibility(View.VISIBLE);
-                        DanmuModel model = new DanmuModel();
-                        model.setType("100");
-                        model.setContent(otherUserId);
-                        sendMessage(model);
-                    }else{
+                    } else {
                         toast("连麦注册失败");
                     }
-//                    if ( mIsRegisted) {
-//                        mStreamer.getRtcClient().startCall(otherUserId);
-//                        mLianmaiStop.setText("连麦中...");
-//                        mLianmaiStop.setVisibility(View.VISIBLE);
-//                    }else{
-//                        toast("连麦注册失败");
-//                    }
                     break;
                 case R.id.image_live_jinyan:
                     JSONObject temp = new JSONObject();
@@ -2933,10 +2690,6 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                         @Override
                         public void requestSuccess(int code, JSONObject data) {
                             toast(data.getString("descrp"));
-                            DanmuModel model = new DanmuModel();
-                            model.setType("21");
-                            model.setContent(otherUserId);
-                            sendMessage(model);
                         }
 
                         @Override
@@ -2958,6 +2711,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         public void onEventChanged(int event, Object arg1) {
             switch (event) {
                 case RTCClient.RTC_EVENT_REGISTED:
+                    System.out.print("RTC_EVENT_REGISTED执行了——————");
                     doRegisteredSuccess();
                     break;
                 case RTCClient.RTC_EVENT_STARTED:
@@ -2973,6 +2727,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                 case RTCClient.RTC_EVENT_UNREGISTED:
                     Log.d(TAG, "unregister result:" + arg1);
                     doUnRegisteredResult();
+
                     break;
                 default:
                     break;
@@ -2996,6 +2751,7 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
                     doRTCCallBreak();
                     break;
                 case RTCClient.RTC_ERROR_STARTED_FAILED:
+                    System.out.print(arg1+"arg1arg1arg1");
                     doStartCallFailed(arg1);
                     break;
                 default:
@@ -3029,25 +2785,29 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         }
 
     }
+
     private void doRegisteredSuccess() {
+        System.out.print("mIsRegisted = true");
         mIsRegisted = true;
     }
 
     private void doStartCallSuccess() {
+        check.setVisibility(View.VISIBLE);
+
         mIsConnected = true;
         //can stop call
-        //mStreamer.startRTC();
+        mStreamer.startRTC();
 
         mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
         mLianmaiStop.setVisibility(View.VISIBLE);
-        //mLianmaiStop.setText("停止连麦");
+        mLianmaiStop.setText("停止连麦");
     }
 
     private void doStopCallResult() {
         mIsConnected = false;
         //can start call again
         //to stop RTC video/audio
-        //mStreamer.stopRTC();
+        mStreamer.stopRTC();
         mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
         mLianmaiStop.setVisibility(View.GONE);
     }
@@ -3060,15 +2820,14 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 //                .LENGTH_SHORT).show();
         toast("连麦失败");
         mLianmaiStop.setVisibility(View.GONE);
-
     }
 
     private void doRTCCallBreak() {
         mIsConnected = false;
-        //Toast.makeText(this, "call break", Toast
-         //       .LENGTH_SHORT).show();
+        Toast.makeText(this, "call break", Toast
+                .LENGTH_SHORT).show();
         //to stop RTC video/audio
-        //mStreamer.stopRTC();
+        mStreamer.stopRTC();
         mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
     }
 
@@ -3077,13 +2836,16 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         if (mIsConnected) {
             mStreamer.getRtcClient().rejectCall();
         } else {
-            mStreamer.getRtcClient().answerCall();
+
         }
     }
+
     private void doAuthFailed() {
         //register failed
 
         //can register again
+        System.out.print("mIsRegisted = false");
+
         mIsRegisted = false;
     }
 
@@ -3092,8 +2854,10 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
         //can register again
         mIsRegisted = false;
+        System.out.print("mIsRegisted = false");
+
         if (mIsConnected) {
-            //mStreamer.stopRTC();
+            mStreamer.stopRTC();
             mIsConnected = false;
         }
     }
@@ -3101,18 +2865,21 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
 
     private void doUnRegisteredResult() {
         mIsRegisted = false;
+        System.out.print("mIsRegisted = false");
+
         if (mIsConnected) {
-            //mStreamer.stopRTC();
+            mStreamer.stopRTC();
             mIsConnected = false;
         }
         //can register again
 
         mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
     }
+
     private void doRegister(String authString) {
         //must set before register
         mStreamer.setRTCSubScreenRect(0.65f, 0.7f, 0.35f, 0.3f, RTCConstants.SCALING_MODE_CENTER_CROP);
-        mStreamer.getRtcClient().setRTCAuthInfo(RTC_AUTH_URI, authString,channel_creater);
+        mStreamer.getRtcClient().setRTCAuthInfo(RTC_AUTH_URI, authString, channel_creater);
         mStreamer.getRtcClient().setRTCUniqueName(RTC_UINIQUE_NAME);
         //has default value
         mStreamer.getRtcClient().openChattingRoom(false);
@@ -3143,145 +2910,394 @@ public class PublishActivity extends BaseActivity implements AdapterView.OnItemC
         startLive(mInputLiveTitle.getText().toString());
     }
 
-    /***********************************
-     * for rtc sub move&switch
-     ********************************/
-    private float mSubTouchStartX;
-    private float mSubTouchStartY;
-    private float mLastRawX;
-    private float mLastRawY;
-    private float mLastX;
-    private float mLastY;
-    private float mSubMaxX = 0;   //小窗可移动的最大X轴距离
-    private float mSubMaxY = 0;  //小窗可以移动的最大Y轴距离
-    private boolean mIsSubMoved = false;  //小窗是否移动过了，如果移动过了，ACTION_UP时不触发大小窗内容切换
-    private int SUB_TOUCH_MOVE_MARGIN = 30;  //触发移动的最小距离
 
-    private CameraTouchHelper.OnTouchListener mRTCSubScreenTouchListener = new CameraTouchHelper.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent event) {
-            //获取相对屏幕的坐标，即以屏幕左上角为原点
-            mLastRawX = event.getRawX();
-            mLastRawY = event.getRawY();
-            // 预览区域的大小
-            int width = view.getWidth();
-            int height = view.getHeight();
-            //小窗的位置信息
-            RectF subRect = mStreamer.getRTCSubScreenRect();
-            int left = (int) (subRect.left * width);
-            int right = (int) (subRect.right * width);
-            int top = (int) (subRect.top * height);
-            int bottom = (int) (subRect.bottom * height);
-            int subWidth = right - left;
-            int subHeight = bottom - top;
+    //禁止下注
+    public void forbidChip() {
+        JSONObject params = new JSONObject();
+        params.put("token", (String) SharePrefsUtils.get(PublishActivity.this, "user", "token", ""));
+        params.put("gameid", start.getGameid());
 
+        Api.forbidChip(PublishActivity.this, params, new OnRequestDataListener() {
+            @Override
+            public void requestSuccess(int code, JSONObject data) {
+                System.out.println("forbidChip-requestSuccess-->" + data.toString());
+                sunmit_onclick.setClickable(true);
 
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    //只有在小屏区域才触发位置改变
-                    if (isSubScreenArea(event.getX(), event.getY(), left, right, top, bottom)) {
-                        //获取相对sub区域的坐标，即以sub左上角为原点
-                        mSubTouchStartX = event.getX() - left;
-                        mSubTouchStartY = event.getY() - top;
-                        mLastX = event.getX();
-                        mLastY = event.getY();
-                    }
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    int moveX = (int) Math.abs(event.getX() - mLastX);
-                    int moveY = (int) Math.abs(event.getY() - mLastY);
-                    if (mSubTouchStartX > 0f && mSubTouchStartY > 0f && (
-                            (moveX > SUB_TOUCH_MOVE_MARGIN) ||
-                                    (moveY > SUB_TOUCH_MOVE_MARGIN))) {
-                        //触发移动
-                        mIsSubMoved = true;
-                        updateSubPosition(width, height, subWidth, subHeight);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    //未移动并且在小窗区域，则触发大小窗切换
-                    if (!mIsSubMoved && isSubScreenArea(event.getX(), event.getY(), left, right,
-                            top, bottom)) {
-                        mStreamer.switchRTCMainScreen();
-                    }
+                JSONObject info = data.getJSONObject("data");
+                if ("1".equals(info.getString("status"))) {
+                    mHandler.removeCallbacksAndMessages(null);
 
-                    mIsSubMoved = false;
-                    mSubTouchStartX = 0f;
-                    mSubTouchStartY = 0f;
-                    mLastX = 0f;
-                    mLastY = 0f;
-                    break;
+                    type = "2";
+                    kaijiang_lin.setVisibility(View.VISIBLE);
+                    sunmit_onclick.setText("开奖");
+                    sunmit_onclick.setBackgroundResource(R.drawable.yuan);
+
+                    finishTime = "0";
+                    time.setText("0");
+                    time_text.setVisibility(View.INVISIBLE);
+                    time.setVisibility(View.INVISIBLE);
+
+                } else {
+                    mHandler.removeCallbacksAndMessages(null);
+
+                    toastor.showToast("游戏已开奖，设置失败");
+
+                }
+
             }
 
-            return true;
+            @Override
+            public void requestFailure(int code, String msg) {
+                System.out.println("forbidChip-requestFailure-->" + code + msg);
+
+                toastor.showToast("操作失败，请重试");
+            }
+        });
+
+    }
+
+    //开奖
+    public void prize() {
+        JSONObject params = new JSONObject();
+        params.put("token", (String) SharePrefsUtils.get(PublishActivity.this, "user", "token", ""));
+        params.put("prize_type", prize_type.substring(0, prize_type.length() - 1));
+        params.put("gameid", start.getGameid());
+        System.out.println(params.toJSONString());
+        Api.prize(PublishActivity.this, params, new OnRequestDataListener() {
+            @Override
+            public void requestSuccess(int code, JSONObject data) {
+                System.out.println("prize-requestSuccess-->" + data.toString());
+                sunmit_onclick.setClickable(true);
+
+                JSONObject info = data.getJSONObject("data");
+
+                toastor.showToast("开奖成功");
+                type = "0";
+
+                kaijiang_lin.setVisibility(View.INVISIBLE);
+                textGone();
+
+                sunmit_onclick.setText("");
+                sunmit_onclick.setBackgroundResource(R.drawable.kaishi);
+
+                finishTime = "0";
+                prize_type = "";
+                time.setText("0");
+            }
+
+            @Override
+            public void requestFailure(int code, String msg) {
+                System.out.println("prize-requestFailure-->" + code + msg);
+
+                toastor.showToast("操作失败，请重试");
+            }
+        });
+
+    }
+
+    public void start() {
+        JSONObject params = new JSONObject();
+        params.put("token", (String) SharePrefsUtils.get(PublishActivity.this, "user", "token", ""));
+        params.put("type", "1");
+        System.out.println(params.toJSONString());
+        Api.start(PublishActivity.this, params, new OnRequestDataListener() {
+            @Override
+            public void requestSuccess(int code, JSONObject data) {
+                System.out.println("start-requestSuccess-->" + data.toString());
+
+                sunmit_onclick.setClickable(true);
+
+                sunmit_onclick.setText("停止下注");
+                sunmit_onclick.setBackgroundResource(R.drawable.yuan);
+
+                JSONObject info = data.getJSONObject("data");
+                start = gson.fromJson(info.toJSONString(), Start.class);
+                time_text.setVisibility(View.VISIBLE);
+                time.setVisibility(View.VISIBLE);
+                System.out.println(Long.valueOf(start.getEtime()) + "getEtime");
+                System.out.println(Long.valueOf(start.getStime()) + "getStime");
+                System.out.println("now" + Long.valueOf((new Date().getTime() + "").substring(0, (new Date().getTime() + "").length() - 3)));
+
+                finishTime = (Long.valueOf(start.getEtime()) - Long.valueOf(start.getStime())) + "";
+
+                //  finishTime = (Long.valueOf(start.getEtime()) - Long.valueOf((new Date().getTime() + "").substring(0, (new Date().getTime() + "").length() - 3))) + "";
+                type = "1";
+                Message message = new Message();
+                message.what = 1;
+                mHandler.sendMessage(message);
+            }
+
+            @Override
+            public void requestFailure(int code, String msg) {
+                System.out.println("start-requestFailure-->" + code + msg);
+
+                if (code == 550) {
+//存在未完成的游戏
+                    sunmit_onclick.setClickable(true);
+
+                    final MyAlerDialogKaiJiang namedialog = new MyAlerDialogKaiJiang(PublishActivity.this) {
+
+                        @Override
+                        public void clickCancelBack(MyAlerDialogKaiJiang log) {
+                            // TODO Auto-generated method stub
+
+                            log.dismiss();
+                        }
+
+                        @Override
+                        public void clickConfirmBack(MyAlerDialogKaiJiang log) {
+                            // TODO Auto-generated method stub
+
+                            checkRecovery();
+
+                            log.dismiss();
+                        }
+                        // 重写callback方法
+
+                    };
+                    namedialog.show();
+                    namedialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+
+
+                }
+            }
+        });
+
+    }
+
+    //有未完成的游戏
+    public void checkRecovery() {
+        JSONObject params = new JSONObject();
+        params.put("token", (String) SharePrefsUtils.get(PublishActivity.this, "user", "token", ""));
+        params.put("id", (String) SharePrefsUtils.get(PublishActivity.this, "user", "userId", ""));
+        Api.checkRecovery(PublishActivity.this, params, new OnRequestDataListener() {
+            @Override
+            public void requestSuccess(int code, JSONObject data) {
+                System.out.println("checkRecovery-requestSuccess-->" + data.toString());
+
+                JSONObject info = data.getJSONObject("data");
+
+                start = gson.fromJson(info.toJSONString(), Start.class);
+//弹出开奖框
+                sunmit_onclick.setText("开奖");
+                sunmit_onclick.setBackgroundResource(R.drawable.yuan);
+
+                type = "2";
+                kaijiang_lin.setVisibility(View.VISIBLE);
+
+            }
+
+            @Override
+            public void requestFailure(int code, String msg) {
+                System.out.println("checkRecovery-requestFailure-->" + code + msg);
+
+                toastor.showToast("操作失败，请重试");
+            }
+        });
+
+    }
+    boolean ischeck=false;
+    @OnClick(R.id.check)
+    public void checkOnclick(View view) {
+
+        if (ischeck) {
+            mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
+
+            ischeck=false;
+        }else {
+            mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_REMOTE);
+            ischeck=true;
+
         }
+    }
+    @OnClick(R.id.sunmit_onclick)
+    public void submitOnclick(View view) {
+        if ("0".equals(type)) {
+            kaijiang_lin.setVisibility(View.INVISIBLE);
+            start();
+            sunmit_onclick.setClickable(false);
+
+
+        }
+        if ("1".equals(type)) {
+            //游戏中状态到停止下注
+
+
+            forbidChip();
+            sunmit_onclick.setClickable(false);
+
+        }
+        if ("2".equals(type)) {
+            //开奖
+            kaijiang_lin.setVisibility(View.VISIBLE);
+            if (Check.isEmpty(prize_type)) {
+                toastor.showToast("请选择");
+                return;
+            }
+            if (prize_type.indexOf("x|") != -1 || prize_type.indexOf("h|") != -1 || prize_type.indexOf("z|") != -1) {
+
+            } else {
+                toastor.showToast("请选择");
+                return;
+            }
+
+
+            prize();
+            sunmit_onclick.setClickable(false);
+
+        }
+    }
+
+    public void textGone() {
+        x_text.setBackgroundResource(R.drawable.game_kaijaing);
+        xd_text.setBackgroundResource(R.drawable.game_kaijaing);
+        h_text.setBackgroundResource(R.drawable.game_kaijaing);
+        z_text.setBackgroundResource(R.drawable.game_kaijaing);
+        zd_text.setBackgroundResource(R.drawable.game_kaijaing);
+
+    }
+
+    String prize_type = "";
+
+
+    @OnClick(R.id.x_text)
+    public void xKaiJiang(View view) {
+        //  textGone();
+        if (prize_type.indexOf("h|") != -1 || prize_type.indexOf("z|") != -1) {
+            toast("信息有误");
+            return;
+
+        }
+
+        if (prize_type.indexOf("x|") != -1) {
+            prize_type = prize_type.replace("x|", "");
+            x_text.setBackgroundResource(R.drawable.game_kaijaing);
+
+            return;
+        }
+        x_text.setBackgroundResource(R.drawable.game_kaijaing_on);
+        prize_type = prize_type + "x|";
+    }
+
+    @OnClick(R.id.xd_text)
+    public void xdKaiJiang(View view) {
+        // textGone();
+        if (prize_type.indexOf("xd|") != -1) {
+            prize_type = prize_type.replace("xd|", "");
+            xd_text.setBackgroundResource(R.drawable.game_kaijaing);
+
+            return;
+        }
+        xd_text.setBackgroundResource(R.drawable.game_kaijaing_on);
+        prize_type = prize_type + "xd|";
+    }
+
+    @OnClick(R.id.h_text)
+    public void hKaiJiang(View view) {
+        //   textGone();
+
+        if (prize_type.indexOf("x|") != -1 || prize_type.indexOf("z|") != -1) {
+            toast("信息有误");
+            return;
+
+        }
+
+        if (prize_type.indexOf("h|") != -1) {
+            prize_type = prize_type.replace("h|", "");
+            h_text.setBackgroundResource(R.drawable.game_kaijaing);
+
+            return;
+        }
+        h_text.setBackgroundResource(R.drawable.game_kaijaing_on);
+        prize_type = prize_type + "h|";
+    }
+
+    @OnClick(R.id.z_text)
+    public void zKaiJiang(View view) {
+        //  textGone();
+
+        if (prize_type.indexOf("x|") != -1 || prize_type.indexOf("h|") != -1) {
+            toast("信息有误");
+            return;
+
+        }
+        if (prize_type.indexOf("z|") != -1) {
+            prize_type = prize_type.replace("z|", "");
+            z_text.setBackgroundResource(R.drawable.game_kaijaing);
+
+            return;
+        }
+        z_text.setBackgroundResource(R.drawable.game_kaijaing_on);
+        prize_type = prize_type + "z|";
+    }
+
+    @OnClick(R.id.zd_text)
+    public void zdKaiJiang(View view) {
+        // textGone();
+        if (prize_type.indexOf("zd|") != -1) {
+            prize_type = prize_type.replace("zd|", "");
+            zd_text.setBackgroundResource(R.drawable.game_kaijaing);
+
+            return;
+        }
+        zd_text.setBackgroundResource(R.drawable.game_kaijaing_on);
+        prize_type = prize_type + "zd|";
+    }
+
+
+    private Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            int id = msg.what;
+
+            switch (id) {
+
+
+                case 1:
+                    //开始
+                    finishTime = (NumberUtil.convertToInteger(finishTime) - 1) + "";
+
+                    time.setText(finishTime + "秒");
+                    Message message = new Message();
+                    message.what = 2;
+                    mHandler.sendMessageDelayed(message, 1000);
+
+                    break;
+                case 2:
+                    //时间减少
+                    System.out.println("-->" + (NumberUtil.convertToInteger(finishTime) - 1));
+                    if (NumberUtil.convertToInteger(finishTime) - 1 <= 0) {
+                        mHandler.removeCallbacksAndMessages(null);
+                        kaijiang_lin.setVisibility(View.VISIBLE);
+                        textGone();
+
+                        type = "2";
+                        sunmit_onclick.setText("开奖");
+                        sunmit_onclick.setBackgroundResource(R.drawable.yuan);
+
+                        time_text.setVisibility(View.INVISIBLE);
+                        time.setVisibility(View.INVISIBLE);
+
+                        return;
+                    }
+                    finishTime = (NumberUtil.convertToInteger(finishTime) - 1) + "";
+
+                    time.setText(finishTime + "秒");
+
+                    Message message1 = new Message();
+                    message1.what = 2;
+                    mHandler.sendMessageDelayed(message1, 1000);
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
     };
 
-    /**
-     * 是否在小窗区域移动
-     *
-     * @param x      当前点击的相对小窗左上角的x坐标
-     * @param y      当前点击的相对小窗左上角的y坐标
-     * @param left   小窗左上角距离预览区域左上角的x轴距离
-     * @param right  小窗右上角距离预览区域左上角的x轴距离
-     * @param top    小窗左上角距离预览区域左上角的y轴距离
-     * @param bottom 小窗右上角距离预览区域左上角的y轴距离
-     * @return
-     */
-    private boolean isSubScreenArea(float x, float y, int left, int right, int top, int bottom) {
-        if (!mIsConnected) {
-            return false;
-        }
-        if (x > left && x < right &&
-                y > top && y < bottom) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 触发移动小窗
-     *
-     * @param screenWidth 预览区域width
-     * @param sceenHeight 预览区域height
-     * @param subWidth    小窗区域width
-     * @param subHeight   小窗区域height
-     */
-    private void updateSubPosition(int screenWidth, int sceenHeight, int subWidth, int subHeight) {
-        mSubMaxX = screenWidth - subWidth;
-        mSubMaxY = sceenHeight - subHeight;
-
-        //更新浮动窗口位置参数
-        float newX = (mLastRawX - mSubTouchStartX);
-        float newY = (mLastRawY - mSubTouchStartY);
-
-        //不能移出预览区域最左边和最上边
-        if (newX < 0) {
-            newX = 0;
-        }
-
-        if (newY < 0) {
-            newY = 0;
-        }
-
-        //不能移出预览区域最右边和最下边
-        if (newX > mSubMaxX) {
-            newX = mSubMaxX;
-        }
-
-        if (newY > mSubMaxY) {
-            newY = mSubMaxY;
-        }
-        //小窗的width和height不发生变化
-        RectF subRect = mStreamer.getRTCSubScreenRect();
-        float width = subRect.width();
-        float height = subRect.height();
-
-        float left = newX / screenWidth;
-        float top = newY / sceenHeight;
-
-        mStreamer.setRTCSubScreenRect(left, top, width, height, RTCConstants.SCALING_MODE_CENTER_CROP);
-    }
+    String charge_type = "0";
 
 }

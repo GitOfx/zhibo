@@ -3,63 +3,123 @@
     android:oneshot="false">
 
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010001"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010002"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010003"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010004"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010005"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010006"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010007"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010008"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010009"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010010"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010011"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010001"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010012"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010001"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010013"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010014"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010015"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010016"/>
     <item
-        android:duration="200"
+        android:duration="150"
         android:drawable="@mipmap/srhd00010017"/>
     <item
-        android:duration="200"
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010018"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010001"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010002"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010003"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010004"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010005"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010006"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010007"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010008"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010009"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010010"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010011"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010001"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010012"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010001"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010013"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010014"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010015"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010016"/>
+    <item
+        android:duration="150"
+        android:drawable="@mipmap/srhd00010017"/>
+    <item
+        android:duration="150"
         android:drawable="@mipmap/srhd00010018"/>
 </animation-list>

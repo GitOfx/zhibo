@@ -96,6 +96,23 @@ public class Api {
     public static final String XIEYI = HOST + "portal/page/index/id/2";
     public static final String SWITCH_MODE = HOST + "Api/SiSi/livingChangeRoomType";
 
+    public static final String START_URL = HOST + "Api/game/start";
+    public static final String CHIP_URL = HOST + "Api/game/chip";
+    public static final String GAMEHEART_URL = HOST + "Api/game/gameHeart";
+    public static final String PRIZE_URL = HOST + "Api/game/prize";
+    public static final String RECORD_URL = HOST + "Api/game/record";
+
+    public static final String GETCHIPTYPE_URL = HOST + "Api/game/getChipType";
+    public static final String CHECKRECOVERY_URL = HOST + "Api/game/checkRecovery";
+    public static final String FORBIDCHIP_URL = HOST + "Api/game/forbidChip";
+    public static final String GETBALANCE_URL = HOST + "Api/game/getBalance";
+
+    public static final String GETMESSAGE_URL = HOST + "Api/SiSi/getMessage";
+    public static void getMessage(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(GETMESSAGE_URL, context, params,null, listener);
+    }
+
     public static void doRegister(final Context context, JSONObject params, final OnRequestDataListener listener) {
         SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
         excutePost(DO_REGISTER, context, params,dialog, listener);
@@ -364,6 +381,72 @@ public class Api {
         excutePost(GET_TOPIC, context, params,null, listener);
     }
 
+    /**
+     *  主播开始游戏接口
+     */
+    public static void start(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(START_URL, context, params, null, listener);
+    }
+    /**
+     *  用户下注接口
+     */
+    public static void chip(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(CHIP_URL, context, params, null, listener);
+    }
+    /**
+     *  3、游戏心跳
+     */
+    public static void gameHeart(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(GAMEHEART_URL, context, params, null, listener);
+    }
+    /**
+     *  主播开奖
+     */
+    public static void prize(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(PRIZE_URL, context, params, null, listener);
+    }
+    /**
+     *  主播开奖
+     */
+    public static void record(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(RECORD_URL, context, params, null, listener);
+    }
+
+    /**
+     *  禁止下注接口（主播使用）
+     */
+    public static void forbidChip(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(FORBIDCHIP_URL, context, params, null, listener);
+    }
+
+    /**
+     *  获取用户余额接口
+     */
+    public static void getBalance(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(GETBALANCE_URL, context, params, null, listener);
+    }
+
+    /**
+     *  获取筹码类型接口
+     */
+    public static void getChipType(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(GETCHIPTYPE_URL, context, params, null, listener);
+    }
+    /**
+     *  7、主播获取上一场未开奖游戏接口
+     */
+    public static void checkRecovery(final Context context, JSONObject params, final OnRequestDataListener listener) {
+        //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
+        excutePost(CHECKRECOVERY_URL, context, params, null, listener);
+    }
 
     public static void doSwitchMode(final Context context, JSONObject params, final OnRequestDataListener listener) {
         //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");

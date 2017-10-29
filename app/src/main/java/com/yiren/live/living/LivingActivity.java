@@ -59,6 +59,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -82,8 +83,10 @@ import com.ksyun.media.streamer.kit.OnAudioRawDataListener;
 import com.ksyun.media.streamer.kit.OnPreviewFrameListener;
 import com.ksyun.media.streamer.kit.StreamerConstants;
 import com.ksyun.media.streamer.logstats.StatsLogReport;
+import com.litesuits.common.assist.Check;
 import com.meetme.android.horizontallistview.HorizontalListView;
 import com.smart.androidui.widget.input.SoftKeyboardStateHelper;
+import com.yiren.live.R;
 import com.yiren.live.base.BaseActivity;
 import com.smart.androidutils.images.GlideCircleTransform;
 import com.smart.androidutils.utils.LogUtils;
@@ -97,7 +100,6 @@ import com.smart.loginsharesdk.share.onekeyshare.Type;
 import cn.leancloud.chatkit.cache.LCIMConversationItemCache;
 import com.yiren.live.MainActivity;
 import com.yiren.live.MyApplication;
-import com.yiren.live.R;
 import com.yiren.live.home.model.VideoItem;
 import com.yiren.live.intf.OnCustomClickListener;
 import com.yiren.live.intf.OnRequestDataListener;
@@ -109,6 +111,7 @@ import com.yiren.live.own.userinfo.ContributionActivity;
 import com.yiren.live.utils.Api;
 import com.yiren.live.utils.DialogEnsureUtiles;
 import com.yiren.live.utils.FunctionUtile;
+import com.yiren.live.view.AlwaysMarqueeTextView;
 import com.yiren.live.view.BubbleView;
 import com.yiren.live.view.SFProgrssDialog;
 
@@ -152,7 +155,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     @Bind(R.id.live_top_layer)
     public FrameLayout mLiveTopLayer;
     public String balance;
-    public VideoItem mVideoItem = new VideoItem();
+    public VideoItem mVideoItem;
     public String token;
     public String userId;//用户id
     public String user_nicename;
@@ -162,8 +165,8 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     GiftFrameLayout giftFrameLayout1;
     @Bind(R.id.gift_layout2)
     GiftFrameLayout giftFrameLayout2;
-    //@Bind(R.id.live_viewflipper)
-    //ViewFlipper mLiveViewFlipper;
+    @Bind(R.id.live_viewflipper)
+    ViewFlipper mLiveViewFlipper;
     @Bind(R.id.danmu_container)
     RelativeLayout mDanmuContainer;
     @Bind(R.id.danmu_check_box)
@@ -185,7 +188,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     @Bind(R.id.HorizontalListView)
     HorizontalListView mLiveOnlineUsers;
     @Bind(R.id.live_user_total)
-    public TextView mLiveUserTotal;
+    TextView mLiveUserTotal;
     @Bind(R.id.live_user_id)
     TextView mLiveUserId;
     @Bind(R.id.live_bottom_btn)
@@ -215,7 +218,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     @Bind(R.id.living_danmu)
     ListView mLiveingDanmu;
     @Bind(R.id.living_danmu_container)
-    LinearLayout mLivingDanmuContainer;
+    RelativeLayout mLivingDanmuContainer;
     @Bind(R.id.live_music)
     ImageView mLiveMusic;
     @Bind(R.id.linear_live_top_user_container)
@@ -230,8 +233,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     TextView mLianmaiStop;
     @Bind(R.id.btn_follow)
     Button mbtnFollow;
-    @Bind(R.id.chaoguan_container)
-    LinearLayout mChaoguanContainer;
     //TODO 直播结束页面 数据填充:头像,用户名,观众数量
     @Bind(R.id.iv_zhibo_close_icon)
     CircleImageView iv_zhibo_close_icon;
@@ -239,16 +240,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     TextView tv_zhibo_close_username;
     @Bind(R.id.tv_zhibo_close_num)
     TextView tv_zhibo_close_num;
-    @Bind(R.id.shanguan_container)
-    FrameLayout mShanGuanContainer;
-    @Bind(R.id.publish_shop_icon)
-    ImageView mPublishShopIcon;
-    @Bind(R.id.live_money)
-    LinearLayout mLiveMoney;
-    @Bind(R.id.live_danjia)
-    TextView mLiveDanjia;
-    @Bind(R.id.live_user_money)
-    TextView mLiveUserMoney;
     CircleImageView mDialogUserAvatar;
     TextView mDialogUserNicename;
     ImageView mDialogClose;
@@ -282,6 +273,9 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     ArrayList<GiftSendModel> bigAnim = new ArrayList();
     AnimatorSet animatorSet1;
     AnimatorSet animatorSet2;
+    @Bind(R.id.marquee)
+    AlwaysMarqueeTextView marquee;
+
     //实时数据
     Handler dataHandler = new Handler() {
         @Override
@@ -290,9 +284,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         }
     };
     private GLSurfaceView mCameraPreviewView = null;
-    private CameraTouchHelper cameraTouchHelper;
-    //private TextureView mCameraPreviewView;
-    private CameraHintView mCameraHintView;
     private KSYRtcStreamer mStreamer;
     private AuthHttpTask mRTCAuthTask;
     private AuthHttpTask.KSYOnHttpResponse mRTCAuthResponse;
@@ -311,6 +302,11 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     private JSONArray sysMessage;
     private GiftFragment mGiftFragment;
     private Handler myHandler;
+    @Bind(R.id.check)
+    Button check;
+    @Bind(R.id.confirm_button)
+    Button confirm_button;
+
     //漂浮心
     TimerTask task = new TimerTask() {
         public void run() {
@@ -353,7 +349,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     private int mVideoHeight = 0;
     private Context mContext;
     private String guard_status = "0";
-    private String chaoguan = "0";
     Runnable dataRunnable = new Runnable() {
         @Override
         public void run() {
@@ -366,20 +361,17 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     if (isActive) {
                         JSONObject data = data1.getJSONObject("data");
                         if (null != mLiveUserOnlineNum && null != mLiveUserTotal) {
-                            mLiveUserTotal.setText(data.getString("total_earn"));
+
+                            if (Check.isEmpty(type)) {
+                                mLiveUserTotal.setText(getEarn(data.getString("total_earn")));
+                            }else {
+                                mLiveUserTotal.setVisibility(View.GONE);
+
+                            }
+
                             guard_status = data.getString("guard_status");
-                            chaoguan = data.getString("advanced_administrator");
-                            if("1".equals(chaoguan) && mChaoguanContainer.getVisibility() == View.GONE){
-                                mChaoguanContainer.setVisibility(View.VISIBLE);
-                            }
-                            if("0".equals(chaoguan) && mChaoguanContainer.getVisibility() == View.VISIBLE){
-                                mChaoguanContainer.setVisibility(View.GONE);
-                            }
                             mLiveUserOnlineNum.setText(data.getString("online_num"));
-                            MyApplication app = (MyApplication) getApplication();
-                            app.setBalance(data.getString("balance"));
-                            mLiveUserMoney.setText(data.getString("balance"));
-                            dataHandler.postDelayed(dataRunnable, 60000);
+                            dataHandler.postDelayed(dataRunnable, 2000);
                         }
                     }
                 }
@@ -392,6 +384,8 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                                 ksyMediaPlayer.pause();
                             }
                             mLiveEndContainer.setVisibility(View.VISIBLE);
+//                            namedialog.hide();
+//                            namedialog.dismiss();
                             toast("直播结束");
                             break;
                         case 506:
@@ -401,18 +395,11 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                             mLiveEndContainer.setVisibility(View.VISIBLE);
                             toast("直播被封禁");
                             break;
-                        case 507:
-                            if (ksyMediaPlayer != null) {
-                                ksyMediaPlayer.pause();
-                            }
-                            toast("余额不足，请充值");
-                            finish();
-                            break;
                         case 500:
                             toast(msg);
                             break;
                         default:
-                            dataHandler.postDelayed(dataRunnable, 60000);
+                            dataHandler.postDelayed(dataRunnable, 2000);
                             break;
                     }
 
@@ -433,15 +420,14 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     break;
                 case KSYMediaPlayer.MEDIA_INFO_AUDIO_RENDERING_START:
                     //toast("Audio Rendering Start");
-//                    if (null != loading_dialog) {
-//                        loading_dialog.dismiss();
-//                    }
+                    if (null != loading_dialog) {
+                        loading_dialog.dismiss();
+                    }
                     break;
                 case KSYMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
                     //toast("Video Rendering Start");
                     if (null != loading_dialog) {
                         loading_dialog.dismiss();
-                        //initData();
                     }
                     break;
                 case KSYMediaPlayer.MEDIA_INFO_SUGGEST_RELOAD:
@@ -463,6 +449,8 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     //礼物end
     private ThirdShare mThirdShare;
     private Boolean danmuChecked = false;
+    private float mLastX;
+    private float mLastY;
     private IMediaPlayer.OnPreparedListener mOnPreparedListener = new IMediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(IMediaPlayer mp) {
@@ -534,7 +522,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             new StatsLogReport.OnLogEventListener() {
                 @Override
                 public void onLogEvent(StringBuilder singleLogContent) {
-                    Log.i(TAG, "***delong : " + singleLogContent.toString());
+                    Log.i(TAG, "***onLogEvent : " + singleLogContent.toString());
                 }
             };
     private OnAudioRawDataListener mOnAudioRawDataListener = new OnAudioRawDataListener() {
@@ -580,6 +568,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             switch (event) {
                 case RTCClient.RTC_EVENT_REGISTED:
                     doRegisteredSuccess();
+
                     break;
                 case RTCClient.RTC_EVENT_STARTED:
                     doStartCallSuccess();
@@ -605,33 +594,37 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     public void starGiftAnimation(GiftSendModel model) {
         LogUtils.i("delong", model.getGiftCount() + "");
         switch (model.getGift_id()) {
-//            case "1"://钱包
-//                showBigAnim("gift_anim_wallet", model);
-//                break;
-//            case "2"://蛋糕
-//                showBigAnim("gift_anim_dangao", model);
-//                break;
-            case "4"://钻戒
+            case "40":
+                showBigAnim("gift_anim_5", model);
+                break;
+            case "13":
+                showBigAnim("gift_anim_2", model);
+                break;
+            case "48":
+                showBigAnim("gift_anim_3", model);
+                break;
+            case "46":
+                showBigAnim("gift_anim_4", model);
+                break;
+            case "1"://钻戒
                 showBigAnim("gift_anim_jiezhi", model);
                 break;
-            case "8"://跑车
-                showBigAnim("gift_anim_car", model);
+
+            case "2"://岛屿
+                showBigAnim("gift_anim_haidao", model);
                 break;
-//            case "9"://岛屿
-//                showBigAnim("gift_anim_haidao", model);
-//                break;
-//            case "12"://飞机
-//                showBigAnim("gift_anim_feiji", model);
-//                break;
-            case "13"://鲜花
+            case "3"://飞机
+                showBigAnim("gift_anim_feiji", model);
+                break;
+            case "4"://鲜花
                 showBigAnim("gift_anim_flower", model);
                 break;
-//            case "21"://城堡
-//                showBigAnim("gift_anim_chengbao", model);
-//                break;
-//            case "22"://求婚
-//                showBigAnim("gift_anim_qiuhun", model);
-//                break;
+            case "5"://城堡
+                showBigAnim("gift_anim_chengbao", model);
+                break;
+            case "6"://求婚
+                showBigAnim("gift_anim_qiuhun", model);
+                break;
         }
         // layout1正在显示你的礼物动画//并且gift num  大于当前的num
         if (giftFrameLayout1.isShowing()) {
@@ -674,27 +667,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             giftSendModelList.add(model);
         }
     }
-    private  void setAnimationDraw(String pre,int num){
-        AnimationDrawable anim = new AnimationDrawable();
-        for (int i = 1; i <= num; i+=2) {
-            int id;
-            if(i<10){
-                id = getResources().getIdentifier(pre + "0" + i, "drawable", getPackageName());
-            }else{
-                id = getResources().getIdentifier(pre + i, "drawable", getPackageName());
-            }
-
-            Drawable drawable = getResources().getDrawable(id);
-            if(null !=drawable ){
-                anim.addFrame(drawable, 150);
-            }else{
-                break;
-            }
-
-        }
-        anim.setOneShot(false);
-        mLivingGiftBig.setImageDrawable(anim);
-    }
 
     private void showBigAnim(String anim, final GiftSendModel model) {
         if (mLivingGiftBig.getVisibility() == View.VISIBLE) {
@@ -704,35 +676,39 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             mLivingGiftBig.setVisibility(View.VISIBLE);
             mLivingGiftBig.setBackground(null);
             switch (anim) {
-                case "gift_anim_wallet":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_wallet));
+                case "gift_anim_5":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_5);
+                    break;
+                case "gift_anim_2":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_2);
+                    break;
+                case "gift_anim_3":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_3);
+                    break;
+                case "gift_anim_4":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_4);
+                    break;
+
+                case "gift_anim_jiezhi":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_jiezhi);
                     break;
                 case "gift_anim_haidao":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_haidao));
-                    break;
-                case "gift_anim_chengbao":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_chengbao));
-                    break;
-                case "gift_anim_qiuhun":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_qiuhun));
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_haidao);
                     break;
                 case "gift_anim_feiji":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_feiji));
-                    break;
-                case "gift_anim_jiezhi":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_jiezhi));
-                    break;
-                case "gift_anim_dangao":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_dangao));
-                    break;
-                case "gift_anim_car":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_car));
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_feiji);
                     break;
                 case "gift_anim_flower":
-                    mLivingGiftBig.setImageDrawable(getResources().getDrawable(R.drawable.gift_anim_flower));
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_flower);
+                    break;
+                case "gift_anim_chengbao":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_chengbao);
+                    break;
+                case "gift_anim_qiuhun":
+                    mLivingGiftBig.setBackgroundResource(R.drawable.gift_anim_qiuhun);
                     break;
             }
-            AnimationDrawable animTemp = (AnimationDrawable) mLivingGiftBig.getDrawable();
+            AnimationDrawable animTemp = (AnimationDrawable) mLivingGiftBig.getBackground();
             animTemp.start();
             int duration = 0;
             for (int i = 0; i < animTemp.getNumberOfFrames(); i++) {
@@ -741,7 +717,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-                    if(isActive){
+                    if (isActive) {
                         mLivingGiftBig.setVisibility(View.GONE);
                         if (null != bigAnim && bigAnim.size() > 0) {
                             GiftSendModel model1 = bigAnim.get(bigAnim.size() - 1);
@@ -822,6 +798,11 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         });
     }
 
+
+
+
+
+
     @OnClick(R.id.live_share)
     public void showShare(View view) {
         // int locY = DensityUtils.dip2px(LivingActivity.this, 60);
@@ -856,11 +837,11 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     public void danmuCheckChangerd(CompoundButton buttonView, boolean isChecked) {
         CheckBox temp = (CheckBox) buttonView;
         danmuChecked = temp.isChecked();
-//        if (danmuChecked) {
-//            mLiveEditInput.setHint("开启大喇叭，1金币/条");
-//        } else {
+        if (danmuChecked) {
+            mLiveEditInput.setHint("开启大喇叭，1雪花/条");
+        } else {
             mLiveEditInput.setHint("我也要给主播小主发言...");
-//        }
+        }
     }
 
     @OnClick(R.id.image_own_message)
@@ -870,35 +851,29 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
     @OnClick(R.id.publish_shop_icon)
     public void publishShopIcon(View v) {
-//        JSONObject params = new JSONObject();
-//        params.put("token", token);
-//        params.put("room_id", mVideoItem.getRoom_id());
-//        Api.getShopLink(this, params, new OnRequestDataListener() {
-//            @Override
-//            public void requestSuccess(int code, JSONObject data) {
-//                Bundle data1 = new Bundle();
-//                data1.putString("jump", data.getJSONObject("info").getString("shop_url"));
-//                data1.putString("title", mVideoItem.getUser_nicename());
-//                openActivity(WebviewActivity.class, data1);
-//            }
-//
-//            @Override
-//            public void requestFailure(int code, String msg) {
-//                toast(msg);
-//            }
-//        });
-        Bundle data1 = new Bundle();
-        data1.putString("jump",shopInfo.getString("url"));
-        data1.putString("title","");
-        openActivity(WebviewActivity.class,data1);
+        JSONObject params = new JSONObject();
+        params.put("token", token);
+        params.put("room_id", mVideoItem.getRoom_id());
+        Api.getShopLink(this, params, new OnRequestDataListener() {
+            @Override
+            public void requestSuccess(int code, JSONObject data) {
+                Bundle data1 = new Bundle();
+                data1.putString("jump", data.getJSONObject("info").getString("shop_url"));
+                data1.putString("title", mVideoItem.getUser_nicename());
+                openActivity(WebviewActivity.class, data1);
+            }
+
+            @Override
+            public void requestFailure(int code, String msg) {
+                toast(msg);
+            }
+        });
     }
 
     @OnClick(R.id.lianmai_stop)
     public void lianmaiClose(View v) {
         if (null != mStreamer) {
-            if(mIsConnected){
-                mStreamer.getRtcClient().stopCall();
-            }
+            mStreamer.getRtcClient().stopCall();
             v.setVisibility(View.GONE);
         }
     }
@@ -978,7 +953,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
     @OnClick(R.id.praise_anim)
     public void clickHeart() {
-        if (!CLICKED_HEARD && null != mDanmuItems) {
+        if (!CLICKED_HEARD) {
             DanmuModel model = new DanmuModel();
             model.setType("4");
             model.setUserName(user_nicename);
@@ -1037,20 +1012,20 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         return super.onTouchEvent(event);
     }
 
+    @OnClick(R.id.live_close)
+    public void close(View view) {
+        if (ksyMediaPlayer != null)
+            ksyMediaPlayer.release();
+        ksyMediaPlayer = null;
+        finish();
+    }
+
     @OnClick(R.id.btn_living_back_home)
     public void livingBackHome(View view) {
         Intent intent = new Intent(LivingActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        finish();
-    }
-
-    @OnClick(R.id.live_close)
-    public void close(View view) {
-        if (ksyMediaPlayer != null)
-            ksyMediaPlayer.release();
-        ksyMediaPlayer = null;
         finish();
     }
 
@@ -1075,7 +1050,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         requestParams.put("token", token);
         requestParams.put("userid", otherUserId);
         final Button v = (Button) view;
-        if("关注".equals(v.getText())){
+        if ("关注".equals(v.getText())) {
             Api.addAttention(LivingActivity.this, requestParams, new OnRequestDataListener() {
                 @Override
                 public void requestSuccess(int code, JSONObject data) {
@@ -1103,7 +1078,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                 }
             });
 
-        }else{
+        } else {
             Api.cancelAttention(LivingActivity.this, requestParams, new OnRequestDataListener() {
                 @Override
                 public void requestSuccess(int code, JSONObject data) {
@@ -1121,9 +1096,9 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
     @OnClick(R.id.live_sidou)
     public void showUserContribution() {
-        Bundle data = new Bundle();
-        data.putString("id", channel_creater);
-        openActivity(ContributionActivity.class, data);
+//        Bundle data = new Bundle();
+//        data.putString("id", channel_creater);
+//        openActivity(ContributionActivity.class, data);
     }
 
     public void showUserInfoDialogById(String uid) {
@@ -1214,19 +1189,14 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                 }
                 mDialogUserLevel.setText(userInfo.getString("user_level"));
                 int level = Integer.parseInt(userInfo.getString("user_level"));
-                FunctionUtile.setLevel(mContext,mDialogUserLevel,level);
-//                if(level<5){
-//                    mDialogUserLevel.setBackgroundResource(R.drawable.level1);
-//                }
-//                if(level>4 && level<9 ){
-//                    mDialogUserLevel.setBackgroundResource(R.drawable.level2);
-//                }
-//                if(level>8 && level<13 ){
-//                    mDialogUserLevel.setBackgroundResource(R.drawable.level3);
-//                }
-//                if(level>12 ){
-//                    mDialogUserLevel.setBackgroundResource(R.drawable.level3);
-//                }
+
+                if (level < 4) {
+                    mDialogUserLevel.setBackgroundResource(R.drawable.new_userlevel_1);
+                } else if (level >= 4 && level < 16) {
+                    mDialogUserLevel.setBackgroundResource(R.drawable.new_userlevel_2);
+                } else if (level >= 16) {
+                    mDialogUserLevel.setBackgroundResource(R.drawable.new_userlevel_3);
+                }
 
                 mDialogUserId.setText(userInfo.getString("id"));
                 mDialogUserLocation.setText(userInfo.getString("location"));
@@ -1280,19 +1250,27 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             }
         });
     }
+    //有值就是百家乐
+    String type="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST);
 //        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(0, 2);
         Bundle data = getIntent().getExtras();
         if (null != data) {
             mVideoItem = (VideoItem) data.getSerializable("videoItem");
         }
+        type = (String) data.getSerializable("type");
+        if (Check.isEmpty(type)) {
+            confirm_button.setVisibility(View.GONE);
+        }else {
+            confirm_button.setVisibility(View.VISIBLE);
+            marquee.setVisibility(View.VISIBLE);
+        }
+
         String roomPassword = data.getString("password");
         token = (String) SharePrefsUtils.get(this, "user", "token", "");
         userId = (String) SharePrefsUtils.get(this, "user", "userId", "");
@@ -1302,7 +1280,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         JSONObject params = new JSONObject();
         params.put("room_id", mVideoItem.getRoom_id());
         params.put("token", token);
-        params.put("room_password",roomPassword);
+        params.put("room_password", roomPassword);
 //        mVideoTextureView = (TextureView) findViewById(R.id.player_texture);
 //        mVideoTextureView.setSurfaceTextureListener(LivingActivity.this);
 //        mVideoTextureView.setKeepScreenOn(true);
@@ -1322,34 +1300,16 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         ksyMediaPlayer.setScreenOnWhilePlaying(true);
         ksyMediaPlayer.setBufferTimeMax(3);
         ksyMediaPlayer.setTimeout(5, 30);
-        if(null != mVideoItem.getPlay_url()){
-            loading_dialog = SFProgrssDialog.show(LivingActivity.this, "");
-            try {
-                ksyMediaPlayer.setDataSource(mVideoItem.getPlay_url());
-                ksyMediaPlayer.prepareAsync();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
         Api.getChannleInfo(this, params, new OnRequestDataListener() {
             @Override
             public void requestSuccess(int code, JSONObject data) {
-                if(isActive){
+                if (isActive) {
+                    System.out.println(data.toJSONString());
                     channelInfo = data.getJSONObject("data");
                     sysMessage = data.getJSONArray("msg");
-
-                    guard_status = channelInfo.getString("guard_status");
-                    chaoguan = channelInfo.getString("advanced_administrator");
-                    if("1".equals(chaoguan) && mChaoguanContainer.getVisibility() == View.GONE){
-                        mChaoguanContainer.setVisibility(View.VISIBLE);
-                    }
-                    if("0".equals(chaoguan) && mChaoguanContainer.getVisibility() == View.VISIBLE){
-                        mChaoguanContainer.setVisibility(View.GONE);
-                    }
-
                     initData();
-
-
+                    joinChat(userId, channelInfo.getString("leancloud_room"));
                     Glide.with(LivingActivity.this).load(channelInfo.getString("avatar"))
                             .error(R.drawable.icon_avatar_default)
                             .transform(new GlideCircleTransform(LivingActivity.this))
@@ -1360,21 +1320,25 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                             .into(iv_zhibo_close_icon);
                     mLiveUserAvatar.setTag(R.id.image_live_avatar, channelInfo.getString("channel_creater"));
 
+                    if (Check.isEmpty(type)) {
+                        mLiveUserTotal.setText(getEarn(channelInfo.getString("total_earn")));
+                    }else {
+                        mLiveUserTotal.setVisibility(View.GONE);
 
-                    mLiveUserTotal.setText(channelInfo.getString("total_earn"));
+                    }
 
                     mLiveUserId.setText(channelInfo.getString("channel_creater"));
                     channel_creater = channelInfo.getString("channel_creater");
                     mLiveUserNicename.setText(channelInfo.getString("user_nicename"));
                     tv_zhibo_close_username.setText(channelInfo.getString("user_nicename"));
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                    if("1".equals(channelInfo.getString("attention_status"))){
+                    if ("1".equals(channelInfo.getString("attention_status"))) {
                         mbtnFollow.setText("取消");
                     }
                     mDataSource = channelInfo.getString("channel_source");
                     //mDataSource = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
-                    if (null != mDataSource && null == mVideoItem.getPlay_url()) {
-                        loading_dialog = SFProgrssDialog.show(LivingActivity.this, "");
+                    if (null != mDataSource) {
+                        //loading_dialog = SFProgrssDialog.show(LivingActivity.this, "");
                         try {
                             ksyMediaPlayer.setDataSource(mDataSource);
                             ksyMediaPlayer.prepareAsync();
@@ -1382,35 +1346,29 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                             e.printStackTrace();
                         }
                     }
-                    if(StringUtils.isNotEmpty(mVideoItem.getMinute_charge()) && Integer.parseInt(mVideoItem.getMinute_charge()) > 0){
-                        dataHandler.post(dataRunnable);
-                        mLiveMoney.setVisibility(View.VISIBLE);
-                        mLiveDanjia.setText(mVideoItem.getMinute_charge()+"/分钟");
-                       // MyApplication app = (MyApplication) getApplication();
-                       // mLiveUserMoney.setText(app.getBalance());
-                    }
+                    dataHandler.postDelayed(dataRunnable, 2000);
                     mLiveEndContainer.setVisibility(View.GONE);
                 }
-            }
 
+            }
             @Override
             public void requestFailure(int code, String msg) {
                 toast(msg);
-                switch (code){
+                switch (code) {
                     case 508:
                         DialogEnsureUtiles.showInfo(LivingActivity.this, new OnCustomClickListener() {
                             @Override
                             public void onClick(final String value) {
                                 JSONObject params = new JSONObject();
                                 params.put("room_id", mVideoItem.getRoom_id());
-                                params.put("token",token);
-                                params.put("room_password",value);
+                                params.put("token", token);
+                                params.put("room_password", value);
                                 Api.checkPass(LivingActivity.this, params, new OnRequestDataListener() {
                                     @Override
                                     public void requestSuccess(int code, JSONObject data) {
                                         Bundle data1 = new Bundle();
                                         data1.putSerializable("videoItem", mVideoItem);
-                                        data1.putString("password",value);
+                                        data1.putString("password", value);
                                         finish();
                                         openActivity(LivingActivity.class, data1);
                                     }
@@ -1421,11 +1379,12 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                                     }
                                 });
                             }
-                        },"","该房间需要密码");
+                        }, "", "该房间需要密码");
                         break;
                     default:
                         finish();
                 }
+
                 //mLiveEndContainer.setVisibility(View.VISIBLE);
             }
         });
@@ -1449,6 +1408,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                 }
             }
         });
+
         mThirdShare = new ThirdShare(this);
         mThirdShare.setOnShareStatusListener(this);
 
@@ -1472,7 +1432,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
         //rtc
         mCameraPreviewView = (GLSurfaceView) findViewById(R.id.camera_preview);
-        mCameraHintView = (CameraHintView) findViewById(R.id.camera_hint);
         mMainHandler = new Handler();
         mStreamer = new KSYRtcStreamer(this);
         //mStreamer.setUrl("rtmp://test.uplive.ks-cdn.com/live/androidtest");
@@ -1501,7 +1460,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         //mStreamer.setOnAudioRawDataListener(mOnAudioRawDataListener);
         //mStreamer.setOnPreviewFrameListener(mOnPreviewFrameListener);
         mStreamer.getImgTexFilterMgt().setFilter(mStreamer.getGLRender(),
-                ImgTexFilterMgt.KSY_FILTER_BEAUTY_DENOISE);
+                ImgTexFilterMgt.KSY_FILTER_BEAUTY_SKINWHITEN);
         mStreamer.setEnableImgBufBeauty(true);
         mStreamer.getImgTexFilterMgt().setOnErrorListener(new ImgTexFilterBase.OnErrorListener() {
             @Override
@@ -1511,31 +1470,54 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                         ImgTexFilterMgt.KSY_FILTER_BEAUTY_DISABLE);
             }
         });
-
-        // touch focus and zoom support
-        cameraTouchHelper = new CameraTouchHelper();
-        cameraTouchHelper.setCameraCapture(mStreamer.getCameraCapture());
-        mCameraPreviewView.setOnTouchListener(cameraTouchHelper);
-        // set CameraHintView to show focus rect and zoom ratio
-        cameraTouchHelper.setCameraHintView(mCameraHintView);
-        //for rtc sub screen
-        cameraTouchHelper.addTouchListener(mRTCSubScreenTouchListener);
-
         mStreamer.getRtcClient().setRTCErrorListener(mRTCErrorListener);
         //toast(mStreamer.getVersion());
         mStreamer.getRtcClient().setRTCEventListener(mRTCEventListener);
-//        dataHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                onRTCRegisterClick();
-//            }
-//        }, 3000);
+        dataHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                onRTCRegisterClick();
+            }
+        }, 3000);
+
+
+//        namedialog = new MyAlerDialogXiaZhu(LivingActivity.this,mVideoItem.getChannel_creater(),mVideoItem.getRoom_id());
+
+        System.out.print("############");
+        JSONObject paramsMessage = new JSONObject();
+        paramsMessage.put("token", token);
+        Api.getMessage(this, paramsMessage, new OnRequestDataListener() {
+            @Override
+            public void requestSuccess(int code, JSONObject data) {
+                System.out.print(code+"___------"+data.getJSONArray("data"));
+                JSONArray list = data.getJSONArray("data");
+                if (list!=null) {
+                    String str="";
+                    for (int i = 0; i < list.size(); i++) {
+                        JSONObject item =   (JSONObject)list.get(i);
+                        str = str+ item.getString("content")+"-";
+                    }
+                    System.out.print(str);
+                    marquee.setText(str.substring(0,str.length()-1));
+                }
+
+            }
+            @Override
+            public void requestFailure(int code, String msg) {
+                System.out.print(code+"___------"+msg);
+
+            }
+        });
+
+
     }
+//    MyAlerDialogXiaZhu namedialog;
 
 
     //获取点赞图标
     private List<Drawable> mDrawbleList = new ArrayList<>();
-    private void setDrawbleList(){
+
+    private void setDrawbleList() {
         Api.getLikePic(this, new JSONObject(), new OnRequestDataListener() {
             @Override
             public void requestSuccess(int code, final JSONObject data) {
@@ -1547,7 +1529,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                         mDrawbleList.add(loadImageFromNetwork(data.getJSONObject("data").getString("Third")));
                         mDrawbleList.add(loadImageFromNetwork(data.getJSONObject("data").getString("Fourth")));
                         mDrawbleList.add(loadImageFromNetwork(data.getJSONObject("data").getString("Fifth")));
-                        if(null != mDrawbleList && mDrawbleList.size()>0){
+                        if (null != mDrawbleList && mDrawbleList.size() > 0) {
                             bubbleView.setDrawableList(mDrawbleList);
                         }
                     }
@@ -1562,12 +1544,12 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             }
         });
     }
-    private Drawable loadImageFromNetwork(String imageUrl)
-    {
+
+    private Drawable loadImageFromNetwork(String imageUrl) {
         Drawable drawable = null;
         try {
             // 可以在这里通过文件名来判断，是否本地有此图片
-            drawable = Drawable.createFromResourceStream(getResources(),null,
+            drawable = Drawable.createFromResourceStream(getResources(), null,
                     new URL(imageUrl).openStream(), "image.jpg");
         } catch (IOException e) {
             Log.d("test", e.getMessage());
@@ -1578,7 +1560,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             Log.d("test", "not null drawable");
         }
 
-        return drawable ;
+        return drawable;
     }
 
     private String getEarn(String total_earn) {
@@ -1621,10 +1603,14 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     if (disX > 100 && disX > disY) {
                         if (mX - mLastX > 0) {
                             //向右滑动
-                            mLiveTopLayer.setVisibility(View.GONE);
+                            mLiveViewFlipper.setInAnimation(this, R.anim.in_leftright);
+                            mLiveViewFlipper.setOutAnimation(this, R.anim.out_leftright);
+                            mLiveViewFlipper.showNext();
                         } else {
                             //向左滑动
-                            mLiveTopLayer.setVisibility(View.VISIBLE);
+                            mLiveViewFlipper.setInAnimation(this, R.anim.in_rightleft);
+                            mLiveViewFlipper.setOutAnimation(this, R.anim.out_rightleft);
+                            mLiveViewFlipper.showPrevious();
                         }
                         return super.dispatchTouchEvent(ev);
                     }
@@ -1672,6 +1658,13 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
     @OnClick(R.id.live_send)
     public void liveSend(View view) {
+
+        if (Integer.parseInt(user_level)<3) {
+            toast("大于3级方可发消息");
+            return;
+        }
+
+
         mLiveBottomBtn.setVisibility(View.GONE);
         mLiveBottomSend.setVisibility(View.VISIBLE);
         InputMethodManager imm = (InputMethodManager) mLiveEditInput.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1680,63 +1673,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         mLiveEditInput.setFocusableInTouchMode(true);
         mLiveEditInput.findFocus();
         mLiveEditInput.requestFocus();
-    }
-
-    @OnClick(R.id.chaoguan_duanliu)
-    public void chaoguanDuanliu(){
-        JSONObject params = new JSONObject();
-        params.put("token",token);
-        params.put("room_id",channelInfo.getString("room_id"));
-        params.put("type","1000");
-        Api.duanLiu(this, params, new OnRequestDataListener() {
-            @Override
-            public void requestSuccess(int code, JSONObject data) {
-                toast(data.getString("descrp"));
-            }
-
-            @Override
-            public void requestFailure(int code, String msg) {
-                toast(msg);
-            }
-        });
-    }
-
-    @OnClick(R.id.chaoguan_fenjin)
-    public void chaoguanFenjin(){
-        JSONObject params = new JSONObject();
-        params.put("token",token);
-        params.put("room_id",channelInfo.getString("room_id"));
-        params.put("type","2000");
-        Api.duanLiu(this, params, new OnRequestDataListener() {
-            @Override
-            public void requestSuccess(int code, JSONObject data) {
-                toast(data.getString("descrp"));
-            }
-
-            @Override
-            public void requestFailure(int code, String msg) {
-                toast(msg);
-            }
-        });
-    }
-
-    @OnClick(R.id.chaoguan_hot)
-    public void chaoguanHot(){
-        JSONObject params = new JSONObject();
-        params.put("token",token);
-        params.put("room_id",channelInfo.getString("room_id"));
-        params.put("type","3000");
-        Api.duanLiu(this, params, new OnRequestDataListener() {
-            @Override
-            public void requestSuccess(int code, JSONObject data) {
-                toast(data.getString("descrp"));
-            }
-
-            @Override
-            public void requestFailure(int code, String msg) {
-                toast(msg);
-            }
-        });
     }
 
     @OnClick(R.id.live_btn_send)
@@ -1769,10 +1705,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     model.setType("7");//弹幕
                     model.setAvatar(avatar);
                     model.setContent(content);
-                    JSONObject Other = new JSONObject();
-                    Other.put("totalEarn",result.getString("total_earn"));
-                    model.setOther(Other);
-                    mLiveUserTotal.setText(result.getString("total_earn"));
                     sendMessage(model);
                     showDanmuAnim(LivingActivity.this, model);
                 }
@@ -1801,10 +1733,10 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         ImageView giftAvatar = (ImageView) giftPop.findViewById(R.id.gift_pop_avatar);
         TextView giftUserName = (TextView) giftPop.findViewById(R.id.gift_pop_username);
         TextView giftContent = (TextView) giftPop.findViewById(R.id.gift_pop_content);
-        Glide.with(temp).load(model.getAvatar())
+        Glide.with(temp).load(temp.avatar)
                 .error(R.drawable.icon_avatar_default)
                 .into(giftAvatar);
-        giftUserName.setText(model.getUserName());
+        giftUserName.setText(temp.user_nicename);
         giftContent.setText(model.getContent());
         temp.mDanmuContainer.addView(giftPop);
         Animation anim = AnimationUtils.loadAnimation(temp, R.anim.danmu_enter);
@@ -1817,7 +1749,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                if(isActive){
+                if (isActive) {
                     new Handler().post(new Runnable() {
                         @Override
                         public void run() {
@@ -1835,63 +1767,25 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         });
 
     }
-    private void showShanguangAnim(DanmuModel danmu){
-        final View giftPop = View.inflate(this, R.layout.shangguan, null);
-        TextView name = (TextView) giftPop.findViewById(R.id.enter_room_name);
-        TextView textview_user_level = (TextView)giftPop.findViewById(R.id.danmu_text_user_level);
-
-        int level = Integer.parseInt(danmu.getUserLevel());
-        FunctionUtile.setLevel(this,textview_user_level,level);
-//        if(level<5){
-//            textview_user_level.setBackgroundResource(R.drawable.level1);
-//        }
-//        if(level>4 && level<9 ){
-//            textview_user_level.setBackgroundResource(R.drawable.level2);
-//        }
-//        if(level>8 && level<13 ){
-//            textview_user_level.setBackgroundResource(R.drawable.level3);
-//        }
-//        if(level>12 ){
-//            textview_user_level.setBackgroundResource(R.drawable.level3);
-//        }
-        textview_user_level.setText(danmu.getUserLevel());
-        name.setText("金光一闪,"+danmu.getContent());
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.in_leftright);
-        giftPop.startAnimation(anim);
-        mShanGuanContainer.addView(giftPop);
-        Runnable giftTimer = new Runnable() {
-            @Override
-            public void run() {
-                if(isActive){
-                    mShanGuanContainer.removeView(giftPop);
-                }
-
-            }
-        };
-        giftPop.postDelayed(giftTimer, 2000);
-    }
-
 
     public void sendMessage(DanmuModel model) {
-        if (isActive && null != mDanmuItems) {
-            if(!"101".equals(model.getType())){
-                mDanmuItems.add(model);
-                mDanmuadapter.notifyDataSetChanged();
-                mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
-                mLiveEditInput.setText("");
-                if (mLivingDanmuContainer.getVisibility() == View.VISIBLE) {
-                    mLiveBottomBtn.setVisibility(View.VISIBLE);
-                }
-                mLiveBottomSend.setVisibility(View.GONE);
-                SoftKeyboardUtils.closeSoftInputMethod(mLiveEditInput);
+        if (isActive) {
+            mDanmuItems.add(model);
+            mDanmuadapter.notifyDataSetChanged();
+            mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
+            mLiveEditInput.setText("");
+            if (mLivingDanmuContainer.getVisibility() == View.VISIBLE) {
+                mLiveBottomBtn.setVisibility(View.VISIBLE);
             }
+            mLiveBottomSend.setVisibility(View.GONE);
+            SoftKeyboardUtils.closeSoftInputMethod(mLiveEditInput);
         }
         String message = JSONObject.toJSONString(model);
         EventBus.getDefault().post(
                 new LCIMInputBottomBarTextEvent(LCIMInputBottomBarEvent.INPUTBOTTOMBAR_SEND_TEXT_ACTION, message, channelInfo.getString("leancloud_room")));
 
     }
-    JSONObject shopInfo;
+
     private void initData() {
         mDanmuItems = new ArrayList<DanmuModel>();
         mUserItems = new ArrayList<UserModel>();
@@ -1926,10 +1820,8 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     user.setUser_nicename(users.getJSONObject(i).getString("user_nicename"));
                     user.setLevel(users.getJSONObject(i).getString("user_level"));
                     mUserItems.add(user);
-                    Collections.sort(mUserItems);
                     mOnlineUserAdapter.notifyDataSetChanged();
                 }
-                mLiveUserOnlineNum.setText(mUserItems.size()+"");
             }
 
             @Override
@@ -1937,37 +1829,17 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
             }
         });
-//        Api.getShop(this, new JSONObject(), new OnRequestDataListener() {
-//            @Override
-//            public void requestSuccess(int code, JSONObject data) {
-//                if (isActive){
-//                    shopInfo = data.getJSONObject("data");
-//                    if(StringUtils.isNotEmpty(shopInfo.getString("imgurl"))){
-//                        mPublishShopIcon.setVisibility(View.VISIBLE);
-//                        Glide.with(LivingActivity.this).load(shopInfo.getString("imgurl"))
-//                                .error(R.drawable.icon_avatar_default)
-//                                .into(mPublishShopIcon);
-//                    }
-//                }
-//
-//            }
-//
-//            @Override
-//            public void requestFailure(int code, String msg) {
-//
-//            }
-//        });
 
-        if(null != userId && null != channelInfo.getString("leancloud_room")){
-            joinChat(userId, channelInfo.getString("leancloud_room"));
-        }else{
-//            if(isActive)
-//                toast("网络貌似有点问题，请退出重试");
-        }
+
+
 
     }
 
     public void joinChat(String ClientId, final String conversationId) {
+        if (conversationId.length() == 0) {
+            toast("无法获取LC_Room信息，请退出重试");
+            return;
+        }
         LCChatKit.getInstance().open(ClientId, new AVIMClientCallback() {
             @Override
             public void done(AVIMClient avimClient, AVIMException e) {
@@ -2001,7 +1873,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     mDanmuItems.add(model);
                     mDanmuadapter.notifyDataSetChanged();
                     mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
-                   // showShanguangAnim(model);
                     String message = JSONObject.toJSONString(model);
                     EventBus.getDefault().post(
                             new LCIMInputBottomBarTextEvent(LCIMInputBottomBarEvent.INPUTBOTTOMBAR_SEND_TEXT_ACTION, message, channelInfo.getString("leancloud_room")));
@@ -2033,7 +1904,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     @Override
                     public void done(AVIMException e) {
                         if (null != e) {
-                            //toast("消息发送失败");
+                            toast("消息发送失败");
                         }
                     }
                 });
@@ -2053,31 +1924,10 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             model.setContent(temp.getString("content"));
             model.setUserId(temp.getString("userId"));
             model.setAvatar(temp.getString("avatar"));
-            //设置金额显示
-            if(null != temp.getJSONObject("other")){
-                JSONObject in = temp.getJSONObject("other");
-                if(null != in.getString("totalEarn")){
-                    mLiveUserTotal.setText(in.getString("totalEarn"));
-                }
-            }
-            //连麦
-            if(!"100".equals(model.getType()) && !"5".equals(model.getType()) && !"21".equals(model.getType()) && !"22".equals(model.getType())){
-                mDanmuItems.add(model);
-                mDanmuadapter.notifyDataSetChanged();
-                mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
-            }
+            mDanmuItems.add(model);
+            mDanmuadapter.notifyDataSetChanged();
+            mLiveingDanmu.setSelection(mDanmuadapter.getCount() - 1);
             switch (model.getType()) {
-                case "99":
-                    dataHandler.post(dataRunnable);
-                    mLiveMoney.setVisibility(View.VISIBLE);
-                    if (null != temp.getJSONObject("other")) {
-                        JSONObject in = temp.getJSONObject("other");
-                        if (null != in.getString("minute_charge")) {
-                            mLiveDanjia.setText(in.getString("minute_charge") + "/分钟");
-                            mVideoItem.setMinute_charge(in.getString("minute_charge"));
-                        }
-                    }
-                    break;
                 case "4":
                     clickHeart();
                     break;
@@ -2086,7 +1936,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     break;
                 case "6":
                     //系统消息  -  进入房间
-                    if(channel_creater.equals(model.getUserId())){
+                    if (channel_creater.equals(model.getUserId())) {
                         return;
                     }
                     UserModel user = new UserModel();
@@ -2094,17 +1944,13 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     user.setId(model.getUserId());
                     user.setUser_nicename(model.getUserName());
                     mUserItems.add(user);
-                    Collections.sort(mUserItems);
                     mOnlineUserAdapter.notifyDataSetChanged();
-                    mLiveUserOnlineNum.setText(mUserItems.size()+"");
-                    showShanguangAnim(model);
                     break;
                 case "5":
                     //系统消息  -  离开房间
                     UserModel utemp = new UserModel();
                     utemp.setId(model.getUserId());
                     mUserItems.remove(utemp);
-                    mLiveUserOnlineNum.setText(mUserItems.size()+"");
                     mOnlineUserAdapter.notifyDataSetChanged();
                     break;
                 case "2":
@@ -2118,64 +1964,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     gift.setContinuous(giftO.getString("continuous"));
                     String num = (null == giftO.getString("continuousNum")) ? "1" : giftO.getString("continuousNum");
                     showGiftAnim1(LivingActivity.this, model, gift, Integer.parseInt(num));
-                    break;
-                case "100":
-                    //主播邀请连麦
-                    if(userId.equals(model.getContent())){
-                        new AlertDialog.Builder(this)
-                                .setMessage("主播想与你连麦？")
-                                .setPositiveButton("接收", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-//                                    if (ksyMediaPlayer != null) {
-//                                        ksyMediaPlayer.pause();
-//                                        mVideoSurfaceView.setVisibility(View.INVISIBLE);
-//                                    }
-                                        //startCameraPreviewWithPermCheck();
-//                                    FrameLayout.LayoutParams tvLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-//                                            FrameLayout.LayoutParams.MATCH_PARENT);
-//                                    mCameraPreviewView.setLayoutParams(tvLayoutParams);
-//                                    mStreamer.getRtcClient().answerCall();
-                                        //注册呼叫
-
-
-                                        startCameraPreviewWithPermCheck();
-
-                                    }
-                                })
-                                .setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        //mStreamer.getRtcClient().rejectCall();
-                                        DanmuModel model = new DanmuModel();
-                                        model.setType("101");
-                                        model.setContent(channel_creater);
-                                        sendMessage(model);
-                                    }
-                                })
-                                .show();
-                    }
-
-                    break;
-                //主播直播结束
-                case "20":
-                    if (ksyMediaPlayer != null) {
-                        ksyMediaPlayer.pause();
-                    }
-                    mLiveEndContainer.setVisibility(View.VISIBLE);
-                    toast("直播结束");
-                    break;
-                //设置场控
-                case "21":
-                    if(null != model.getContent() && userId.equals(model.getContent())){
-                        guard_status = "1";
-                    }
-                    break;
-                //取消场控
-                case "22":
-                    if(null != model.getContent() && userId.equals(model.getContent())){
-                        guard_status = "0";
-                    }
                     break;
             }
         }
@@ -2275,7 +2063,6 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                 }
             });
         }
-        cameraTouchHelper.removeAllTouchListener();
         if (dataHandler != null) {
             dataHandler.removeCallbacks(dataRunnable);
         }
@@ -2299,13 +2086,16 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             mMainHandler.removeCallbacksAndMessages(null);
             mMainHandler = null;
         }
+        mStreamer.setOnLogEventListener(null);
+
         mStreamer.stopCameraPreview();
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                mStreamer.release();
-            }
-        });
+        mStreamer.release();
+
+//        if (namedialog!=null) {
+//            namedialog.getmHandlerCycle().removeCallbacksAndMessages(null);
+//            namedialog.getmHandler().removeCallbacksAndMessages(null);
+//
+//        }
 
     }
 
@@ -2361,7 +2151,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     protected void onResume() {
         super.onResume();
         getUnread();
-        //startCameraPreviewWithPermCheck();
+        startCameraPreviewWithPermCheck();
         EventBus.getDefault().register(this);
         if (ksyMediaPlayer != null) {
             ksyMediaPlayer.start();
@@ -2400,7 +2190,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                 mRTCAuthResponse = new AuthHttpTask.KSYOnHttpResponse() {
                     @Override
                     public void onHttpResponse(int responseCode, final String response) {
-                        if (responseCode == 200 && isActive) {
+                        if (responseCode == 200) {
                             mMainHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -2439,13 +2229,12 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 
     private void doRegisteredSuccess() {
         mIsRegisted = true;
-        mStreamer.getRtcClient().startCall(channel_creater);
     }
 
     private void doStartCallSuccess() {
         mIsConnected = true;
         //can stop call
-        //mStreamer.startRTC();
+        mStreamer.startRTC();
 
         mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
         mLianmaiStop.setVisibility(View.VISIBLE);
@@ -2455,33 +2244,27 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         mIsConnected = false;
         //can start call again
         //to stop RTC video/audio
-        //mStreamer.stopRTC();
+        mStreamer.stopRTC();
         mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
         mLianmaiStop.setVisibility(View.GONE);
         if (ksyMediaPlayer != null) {
-//            FrameLayout.LayoutParams tvLayoutParams = (FrameLayout.LayoutParams) mCameraPreviewView.getLayoutParams();
-//            tvLayoutParams.height = 1;
-//            tvLayoutParams.width = 1;
-//            mCameraPreviewView.setLayoutParams(tvLayoutParams);
-
+            FrameLayout.LayoutParams tvLayoutParams = (FrameLayout.LayoutParams) mCameraPreviewView.getLayoutParams();
+            tvLayoutParams.height = 1;
+            tvLayoutParams.width = 1;
+            mCameraPreviewView.setLayoutParams(tvLayoutParams);
             mVideoSurfaceView.setVisibility(View.VISIBLE);
             ksyMediaPlayer.start();
             mPause = false;
 
         }
-        //连麦结束 反注册掉
-        mStreamer.stopCameraPreview();
-        mCameraPreviewView.setVisibility(View.GONE);
-        doUnRegister();
+
     }
 
     private void doStartCallFailed(int status) {
         mIsConnected = false;
         //if remote receive visible need hide
 
-//        Toast.makeText(this, "call failed: " + status, Toast
-//                .LENGTH_SHORT).show();
-        Toast.makeText(this, "对方正在连麦，请稍后", Toast
+        Toast.makeText(this, "call failed: " + status, Toast
                 .LENGTH_SHORT).show();
 
     }
@@ -2491,7 +2274,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         Toast.makeText(this, "call break", Toast
                 .LENGTH_SHORT).show();
         //to stop RTC video/audio
-        //mStreamer.stopRTC();
+        mStreamer.stopRTC();
         mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
     }
 
@@ -2503,29 +2286,42 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
             //startCameraPreviewWithPermCheck();
             //mLianmaiContainer.setVisibility(View.VISIBLE);
             //接收拒绝
-//            new AlertDialog.Builder(this)
-//                    .setMessage("主播想与你连麦？")
-//                    .setPositiveButton("接收", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i) {
-//                            if (ksyMediaPlayer != null) {
-//                                ksyMediaPlayer.pause();
-//                                mVideoSurfaceView.setVisibility(View.INVISIBLE);
-//                            }
-//                            //startCameraPreviewWithPermCheck();
-//                            FrameLayout.LayoutParams tvLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-//                                    FrameLayout.LayoutParams.MATCH_PARENT);
-//                            mCameraPreviewView.setLayoutParams(tvLayoutParams);
-//                            mStreamer.getRtcClient().answerCall();
-//                        }
-//                    })
-//                    .setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i) {
-//                            mStreamer.getRtcClient().rejectCall();
-//                        }
-//                    })
-//                    .show();
+//            if (!Check.isEmpty(type)) {
+//            toast("禁止连麦");
+//                return;
+//            }
+
+            new AlertDialog.Builder(this)
+                    .setMessage("主播想与你连麦？")
+                    .setPositiveButton("接收", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            if (Integer.parseInt(user_level)<17) {
+                                toast("大于17级方可连麦");
+                                return;
+                            }
+
+
+                            if (ksyMediaPlayer != null) {
+                                ksyMediaPlayer.pause();
+                                mVideoSurfaceView.setVisibility(View.INVISIBLE);
+                            }
+                            //startCameraPreviewWithPermCheck();
+                            FrameLayout.LayoutParams tvLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                                    FrameLayout.LayoutParams.MATCH_PARENT);
+                            mCameraPreviewView.setLayoutParams(tvLayoutParams);
+                            mStreamer.getRtcClient().answerCall();
+                            check.setVisibility(View.VISIBLE);
+                        }
+                    })
+                    .setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mStreamer.getRtcClient().rejectCall();
+                        }
+                    })
+                    .show();
 
         }
     }
@@ -2543,7 +2339,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         //can register again
         mIsRegisted = false;
         if (mIsConnected) {
-            //mStreamer.stopRTC();
+            mStreamer.stopRTC();
             mIsConnected = false;
         }
     }
@@ -2552,7 +2348,7 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
     private void doUnRegisteredResult() {
         mIsRegisted = false;
         if (mIsConnected) {
-            //mStreamer.stopRTC();
+            mStreamer.stopRTC();
             mIsConnected = false;
         }
         //can register again
@@ -2583,8 +2379,8 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         if (cameraPerm != PackageManager.PERMISSION_GRANTED ||
                 audioPerm != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                Log.e(TAG, "请允许使用摄像头和录音设备");
-                Toast.makeText(this, "请允许使用摄像头和录音设备",
+                Log.e(TAG, "No CAMERA or AudioRecord permission, please check");
+                Toast.makeText(this, "No CAMERA or AudioRecord permission, please check",
                         Toast.LENGTH_LONG).show();
             } else {
                 String[] permissions = {Manifest.permission.CAMERA,
@@ -2594,64 +2390,21 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                         PERMISSION_REQUEST_CAMERA_AUDIOREC);
             }
         } else {
-            if (ksyMediaPlayer != null) {
-                ksyMediaPlayer.pause();
-                mVideoSurfaceView.setVisibility(View.INVISIBLE);
-            }
-            mCameraPreviewView.setVisibility(View.VISIBLE);
             mStreamer.startCameraPreview();
-            dataHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    onRTCRegisterClick();
-                }
-            });
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CAMERA_AUDIOREC) {
-            int j = 0;
-            for(int i=0;i<grantResults.length;i++){
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    j++;
-                }
-            }
-            if(j < grantResults.length-1){
-                DanmuModel model = new DanmuModel();
-                model.setType("101");
-                model.setContent(channel_creater);
-                sendMessage(model);
-            }else{
-                if (ksyMediaPlayer != null) {
-                    ksyMediaPlayer.pause();
-                    mVideoSurfaceView.setVisibility(View.INVISIBLE);
-                }
-                mCameraPreviewView.setVisibility(View.VISIBLE);
-                mStreamer.startCameraPreview();
-                dataHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onRTCRegisterClick();
-                    }
-                });
-            }
-        }
-    }
-
-    private void getUnread(){
+    private void getUnread() {
         int num = 0;
         List<String> convIdList = LCIMConversationItemCache.getInstance().getSortedConversationList();
-        for (String id :convIdList){
+        for (String id : convIdList) {
             AVIMConversation conversation = LCChatKit.getInstance().getClient().getConversation(id);
-            if(conversation.getMembers().size() != 2)
+            if (conversation.getMembers().size() != 2)
                 continue;
             num += LCIMConversationItemCache.getInstance().getUnreadCount(conversation.getConversationId());
         }
         mImageOwnUnread.setVisibility(View.GONE);
-        if(num > 0){
+        if (num > 0) {
             mImageOwnUnread.setVisibility(View.VISIBLE);
         }
     }
@@ -2803,152 +2556,37 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
                     openActivity(UserMainActivity.class, fans_data);
                     break;
                 case R.id.dialog_user_total_area: //贡献榜
-                    Bundle total_data = new Bundle();
-                    total_data.putString("id", otherUserId);
-                    openActivity(ContributionActivity.class, total_data);
+//                    Bundle total_data = new Bundle();
+//                    total_data.putString("id", otherUserId);
+//                    openActivity(ContributionActivity.class, total_data);
+                    break;
+
+                default:
                     break;
             }
         }
     }
-
-    /***********************************
-     * for rtc sub move&switch
-     ********************************/
-    private float mSubTouchStartX;
-    private float mSubTouchStartY;
-    private float mLastRawX;
-    private float mLastRawY;
-    private float mLastX;
-    private float mLastY;
-    private float mSubMaxX = 0;   //小窗可移动的最大X轴距离
-    private float mSubMaxY = 0;  //小窗可以移动的最大Y轴距离
-    private boolean mIsSubMoved = false;  //小窗是否移动过了，如果移动过了，ACTION_UP时不触发大小窗内容切换
-    private int SUB_TOUCH_MOVE_MARGIN = 30;  //触发移动的最小距离
-
-    private CameraTouchHelper.OnTouchListener mRTCSubScreenTouchListener = new CameraTouchHelper.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent event) {
-            //获取相对屏幕的坐标，即以屏幕左上角为原点
-            mLastRawX = event.getRawX();
-            mLastRawY = event.getRawY();
-            // 预览区域的大小
-            int width = view.getWidth();
-            int height = view.getHeight();
-            //小窗的位置信息
-            RectF subRect = mStreamer.getRTCSubScreenRect();
-            int left = (int) (subRect.left * width);
-            int right = (int) (subRect.right * width);
-            int top = (int) (subRect.top * height);
-            int bottom = (int) (subRect.bottom * height);
-            int subWidth = right - left;
-            int subHeight = bottom - top;
+    @OnClick(R.id.confirm_button)
+    public void confirm_button() {
+//        namedialog.show();
+//        namedialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
 
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    //只有在小屏区域才触发位置改变
-                    if (isSubScreenArea(event.getX(), event.getY(), left, right, top, bottom)) {
-                        //获取相对sub区域的坐标，即以sub左上角为原点
-                        mSubTouchStartX = event.getX() - left;
-                        mSubTouchStartY = event.getY() - top;
-                        mLastX = event.getX();
-                        mLastY = event.getY();
-                    }
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    int moveX = (int) Math.abs(event.getX() - mLastX);
-                    int moveY = (int) Math.abs(event.getY() - mLastY);
-                    if (mSubTouchStartX > 0f && mSubTouchStartY > 0f && (
-                            (moveX > SUB_TOUCH_MOVE_MARGIN) ||
-                                    (moveY > SUB_TOUCH_MOVE_MARGIN))) {
-                        //触发移动
-                        mIsSubMoved = true;
-                        updateSubPosition(width, height, subWidth, subHeight);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    //未移动并且在小窗区域，则触发大小窗切换
-                    if (!mIsSubMoved && isSubScreenArea(event.getX(), event.getY(), left, right,
-                            top, bottom)) {
-                        mStreamer.switchRTCMainScreen();
-                    }
 
-                    mIsSubMoved = false;
-                    mSubTouchStartX = 0f;
-                    mSubTouchStartY = 0f;
-                    mLastX = 0f;
-                    mLastY = 0f;
-                    break;
-            }
 
-            return true;
-        }
-    };
-
-    /**
-     * 是否在小窗区域移动
-     *
-     * @param x      当前点击的相对小窗左上角的x坐标
-     * @param y      当前点击的相对小窗左上角的y坐标
-     * @param left   小窗左上角距离预览区域左上角的x轴距离
-     * @param right  小窗右上角距离预览区域左上角的x轴距离
-     * @param top    小窗左上角距离预览区域左上角的y轴距离
-     * @param bottom 小窗右上角距离预览区域左上角的y轴距离
-     * @return
-     */
-    private boolean isSubScreenArea(float x, float y, int left, int right, int top, int bottom) {
-        if (!mIsConnected) {
-            return false;
-        }
-        if (x > left && x < right &&
-                y > top && y < bottom) {
-            return true;
-        }
-
-        return false;
     }
-
-    /**
-     * 触发移动小窗
-     *
-     * @param screenWidth 预览区域width
-     * @param sceenHeight 预览区域height
-     * @param subWidth    小窗区域width
-     * @param subHeight   小窗区域height
-     */
-    private void updateSubPosition(int screenWidth, int sceenHeight, int subWidth, int subHeight) {
-        mSubMaxX = screenWidth - subWidth;
-        mSubMaxY = sceenHeight - subHeight;
-
-        //更新浮动窗口位置参数
-        float newX = (mLastRawX - mSubTouchStartX);
-        float newY = (mLastRawY - mSubTouchStartY);
-
-        //不能移出预览区域最左边和最上边
-        if (newX < 0) {
-            newX = 0;
-        }
-
-        if (newY < 0) {
-            newY = 0;
-        }
-
-        //不能移出预览区域最右边和最下边
-        if (newX > mSubMaxX) {
-            newX = mSubMaxX;
-        }
-
-        if (newY > mSubMaxY) {
-            newY = mSubMaxY;
-        }
-        //小窗的width和height不发生变化
-        RectF subRect = mStreamer.getRTCSubScreenRect();
-        float width = subRect.width();
-        float height = subRect.height();
-
-        float left = newX / screenWidth;
-        float top = newY / sceenHeight;
-
-        mStreamer.setRTCSubScreenRect(left, top, width, height, RTCConstants.SCALING_MODE_CENTER_CROP);
-    }
+//    boolean ischeck=false;
+//    @OnClick(R.id.check)
+//    public void checkOnclick(View view) {
+//
+//        if (ischeck) {
+//            mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_CAMERA);
+//
+//            ischeck=false;
+//        }else {
+//            mStreamer.setRTCMainScreen(RTCConstants.RTC_MAIN_SCREEN_REMOTE);
+//            ischeck=true;
+//
+//        }
+//    }
 }
