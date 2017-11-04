@@ -65,16 +65,16 @@ public class FansListAdapter extends RecyclerView.Adapter<FansListAdapter.FansVi
         int level = Integer.parseInt(item.getUser_level());
         FunctionUtile.setLevel(mContext,holder.mFansLevel,level);
 //        if(level<5){
-//            holder.mFansLevel.setBackgroundResource(R.drawable.level1);
+//            Holder.mFansLevel.setBackgroundResource(R.drawable.level1);
 //        }
 //        if(level>4 && level<9 ){
-//            holder.mFansLevel.setBackgroundResource(R.drawable.level2);
+//            Holder.mFansLevel.setBackgroundResource(R.drawable.level2);
 //        }
 //        if(level>8 && level<13 ){
-//            holder.mFansLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mFansLevel.setBackgroundResource(R.drawable.level3);
 //        }
 //        if(level>12 ){
-//            holder.mFansLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mFansLevel.setBackgroundResource(R.drawable.level3);
 //        }
 
 
@@ -88,11 +88,11 @@ public class FansListAdapter extends RecyclerView.Adapter<FansListAdapter.FansVi
         if("2".equals(item.getChannel_status())){
             holder.mIsLiving.setVisibility(View.VISIBLE);
         }
-       // holder.mFansBtnAttention.setBackground(mContext.getResources().getDrawable(R.drawable.checkbox_follow_shape));
+       // Holder.mFansBtnAttention.setBackground(mContext.getResources().getDrawable(R.drawable.checkbox_follow_shape));
         holder.mImageAddAttention.setVisibility(View.VISIBLE);
         holder.mFansBtnAttention.setText("关注");
         if("1".equals(item.getAttention_status())){
-            //holder.mFansBtnAttention.setBackground(mContext.getResources().getDrawable(R.drawable.checkbox_follow_shape_blue));
+            //Holder.mFansBtnAttention.setBackground(mContext.getResources().getDrawable(R.drawable.checkbox_follow_shape_blue));
             holder.mFansBtnAttention.setText("取消关注");
             holder.mFansBtnAttention.setTextColor(mContext.getResources().getColor(R.color.colorGrayFont));
             holder.mImageAddAttention.setVisibility(View.GONE);

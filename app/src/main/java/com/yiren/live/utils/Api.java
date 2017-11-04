@@ -383,6 +383,8 @@ public class Api {
 
     /**
      *  主播开始游戏接口
+     *  type: 游戏类别 ，目前设定为1
+     token: 令牌
      */
     public static void start(final Context context, JSONObject params, final OnRequestDataListener listener) {
         //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");
@@ -390,6 +392,13 @@ public class Api {
     }
     /**
      *  用户下注接口
+     *  请求参数：
+     {
+     ‘chip’:’{"z":[1,2,4],"zd":[1,2,3],"h":[1,1,1]}’,
+     （参数请看接口6 getChipType 获取对应id）
+     ’gameid’:’游戏id’,
+     ’token’:’令牌’,
+     }
      */
     public static void chip(final Context context, JSONObject params, final OnRequestDataListener listener) {
         //SFProgrssDialog dialog = SFProgrssDialog.show(context,"请稍后...");

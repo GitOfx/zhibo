@@ -160,6 +160,12 @@
             android:name="com.yiren.live.own.PushActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name="com.yiren.live.game.GameActivity"
+            android:screenOrientation="landscape" />
+
+
+
+        <activity
             android:name="com.yiren.live.lean.Chat"
             android:screenOrientation="portrait">
             <intent-filter android:priority="1000">

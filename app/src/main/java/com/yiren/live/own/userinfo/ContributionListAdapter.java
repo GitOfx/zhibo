@@ -75,16 +75,16 @@ public class ContributionListAdapter extends RecyclerView.Adapter<ContributionLi
         int level = Integer.parseInt(item.getUser_level());
         FunctionUtile.setLevel(mContext,holder.mContributionLevel,level);
 //        if(level<5){
-//            holder.mContributionLevel.setBackgroundResource(R.drawable.level1);
+//            Holder.mContributionLevel.setBackgroundResource(R.drawable.level1);
 //        }
 //        if(level>4 && level<9 ){
-//            holder.mContributionLevel.setBackgroundResource(R.drawable.level2);
+//            Holder.mContributionLevel.setBackgroundResource(R.drawable.level2);
 //        }
 //        if(level>8 && level<13 ){
-//            holder.mContributionLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mContributionLevel.setBackgroundResource(R.drawable.level3);
 //        }
 //        if(level>12 ){
-//            holder.mContributionLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mContributionLevel.setBackgroundResource(R.drawable.level3);
 //        }
         holder.mContributionSend.setText(item.getSend_num());
         if("1".equals(item.getSex())){

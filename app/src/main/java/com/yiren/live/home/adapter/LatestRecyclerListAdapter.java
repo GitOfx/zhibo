@@ -54,7 +54,7 @@ public class LatestRecyclerListAdapter extends RecyclerView.Adapter<LatestRecycl
     public void onBindViewHolder(final VideoViewHolder holder, int position) {
         VideoItem item = mVideoItems.get(position);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(imageWidth, imageHeight);
-//        holder.mLinearItemLatestContainer.setLayoutParams(params);
+//        Holder.mLinearItemLatestContainer.setLayoutParams(params);
         holder.mImageHomeLatest.setLayoutParams(params);
         Glide.with(this.mContext).load(item.getAvatar())
                 .error(R.drawable.icon_avatar_default)

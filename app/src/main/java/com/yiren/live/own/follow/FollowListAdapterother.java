@@ -57,16 +57,16 @@ public class FollowListAdapterother extends RecyclerView.Adapter<FollowListAdapt
         int level = Integer.parseInt(item.getUser_level());
         FunctionUtile.setLevel(mContext,holder.mFollowLevel,level);
 //        if(level<5){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level1);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level1);
 //        }
 //        if(level>4 && level<9 ){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level2);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level2);
 //        }
 //        if(level>8 && level<13 ){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
 //        }
 //        if(level>12 ){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
 //        }
         if("1".equals(item.getSex())){
             holder.mFollowSex.setImageResource(R.drawable.userinfo_male);

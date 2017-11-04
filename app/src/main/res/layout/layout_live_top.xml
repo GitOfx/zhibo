@@ -17,14 +17,14 @@
         android:visibility="gone"
         android:layout_width="60dp"
         android:layout_height="40dp" />
-    <tv.qishi.xuebao.living.GiftFrameLayout
+    <com.yiren.live.living.GiftFrameLayout
         android:id="@+id/gift_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="300dp"
         android:visibility="invisible" />
 
-    <tv.qishi.xuebao.living.GiftFrameLayout
+    <com.yiren.live.living.GiftFrameLayout
         android:id="@+id/gift_layout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <tv.qishi.xuebao.view.AlwaysMarqueeTextView
+        <com.yiren.live.view.AlwaysMarqueeTextView
             android:id="@+id/marquee"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -228,7 +228,7 @@
 
     </RelativeLayout>
 
-    <tv.qishi.xuebao.view.BubbleView
+    <com.yiren.live.view.BubbleView
         android:id="@+id/praise_anim"
         android:layout_width="150dp"
         android:layout_height="160dp"
@@ -338,7 +338,7 @@
 
 
         </LinearLayout>
-    </tv.qishi.xuebao.view.BubbleView>
+    </com.yiren.live.view.BubbleView>
 
     <LinearLayout
         android:id="@+id/live_bottom_send"

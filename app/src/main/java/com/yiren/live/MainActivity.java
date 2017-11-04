@@ -25,6 +25,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import cn.leancloud.chatkit.LCChatKit;
 import com.yiren.live.base.BaseActivity;
+import com.yiren.live.game.GameActivity;
 import com.yiren.live.intf.OnRequestDataListener;
 import com.yiren.live.living.PublishActivity;
 import com.yiren.live.own.PushActivity;
@@ -47,7 +48,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        openActivity(GameActivity.class);
 //        if ("".equals(SharePrefsUtils.get(this, "user", "token", "")) || "".equals(SharePrefsUtils.get(this, "user", "userId", ""))) {
 //           // openActivity(LoginActivity.class);
 //            Intent intent = new Intent(this,LoginActivity.class);

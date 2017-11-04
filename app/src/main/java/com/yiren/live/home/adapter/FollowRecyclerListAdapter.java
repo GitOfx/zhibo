@@ -83,16 +83,16 @@ public class FollowRecyclerListAdapter extends RecyclerView.Adapter<FollowRecycl
         int level = Integer.parseInt(item.getUser_level());
         FunctionUtile.setLevel(mContext,holder.mTextUserLevel,level);
 //        if(level<5){
-//            holder.mTextUserLevel.setBackgroundResource(R.drawable.level1);
+//            Holder.mTextUserLevel.setBackgroundResource(R.drawable.level1);
 //        }
 //        if(level>4 && level<9 ){
-//            holder.mTextUserLevel.setBackgroundResource(R.drawable.level2);
+//            Holder.mTextUserLevel.setBackgroundResource(R.drawable.level2);
 //        }
 //        if(level>8 && level<13 ){
-//            holder.mTextUserLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mTextUserLevel.setBackgroundResource(R.drawable.level3);
 //        }
 //        if(level>12 ){
-//            holder.mTextUserLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mTextUserLevel.setBackgroundResource(R.drawable.level3);
 //        }
 
         holder.mLinearVideoContainer.setOnClickListener(new View.OnClickListener() {

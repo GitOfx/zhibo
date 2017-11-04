@@ -67,11 +67,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.FansViewHo
 //        levelMoon1.setBounds(0, 0, levelMoon1.getMinimumWidth(), levelMoon1.getMinimumHeight());
         FunctionUtile.setLevel(mContext,holder.mFansLevel,level);
 //        if(level<4){
-//            holder.mFansLevel.setBackgroundResource(R.drawable.level1);
+//            Holder.mFansLevel.setBackgroundResource(R.drawable.level1);
 //        }else if(level<16){
-//            holder.mFansLevel.setBackgroundResource(R.drawable.level2);
+//            Holder.mFansLevel.setBackgroundResource(R.drawable.level2);
 //        }else{
-//            holder.mFansLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mFansLevel.setBackgroundResource(R.drawable.level3);
 //        }
         holder.mItemContainer.setTag(item.getId());
         if("1".equals(item.getSex())){
@@ -87,7 +87,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.FansViewHo
         holder.mImageAddAttention.setVisibility(View.VISIBLE);
         holder.mFansBtnAttention.setText("关注");
         if("1".equals(item.getAttention_status())){
-            //holder.mFansBtnAttention.setBackground(mContext.getResources().getDrawable(R.drawable.checkbox_follow_shape_blue));
+            //Holder.mFansBtnAttention.setBackground(mContext.getResources().getDrawable(R.drawable.checkbox_follow_shape_blue));
             holder.mFansBtnAttention.setText("取消关注");
             holder.mFansBtnAttention.setTextColor(mContext.getResources().getColor(R.color.colorGrayFont));
             holder.mImageAddAttention.setVisibility(View.GONE);

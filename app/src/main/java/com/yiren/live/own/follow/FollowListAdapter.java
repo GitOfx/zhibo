@@ -68,16 +68,16 @@ public class FollowListAdapter extends RecyclerView.Adapter<FollowListAdapter.Fo
         int level = Integer.parseInt(item.getUser_level());
         FunctionUtile.setLevel(mContext,holder.mFollowLevel,level);
 //        if(level<5){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level1);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level1);
 //        }
 //        if(level>4 && level<9 ){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level2);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level2);
 //        }
 //        if(level>8 && level<13 ){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
 //        }
 //        if(level>12 ){
-//            holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
+//            Holder.mFollowLevel.setBackgroundResource(R.drawable.level3);
 //        }
         holder.mItemContainer.setTag(item.getId());
         holder.mItemContainer.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +97,7 @@ public class FollowListAdapter extends RecyclerView.Adapter<FollowListAdapter.Fo
             holder.mFollowBtnCancel.setTextColor(mContext.getResources().getColor(R.color.home_tab1));
             holder.mImageAddAttention.setVisibility(View.VISIBLE);
         }
-        //holder.mFollowBtnCancel.setVisibility(View.VISIBLE);
+        //Holder.mFollowBtnCancel.setVisibility(View.VISIBLE);
         holder.mFollowBtnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
