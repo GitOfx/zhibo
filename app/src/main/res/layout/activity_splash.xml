@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical"
-    tools:context="com.yiren.live.SplashActivity">
+    tools:context="com.live.xue.SplashActivity">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

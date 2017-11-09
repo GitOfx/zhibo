@@ -16,12 +16,12 @@
         <!--c筹码-->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="185dp"
             android:orientation="vertical">
             <!--第一排-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="92dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -65,7 +65,7 @@
             <!--第一排-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="92dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -110,7 +110,7 @@
         <!--投注-->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="185dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -122,21 +122,21 @@
                     android:id="@+id/item_xd"
                     layout="@layout/xiazhu_item"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="76dp"
                     android:layout_weight="1"></include>
 
                 <include
                     layout="@layout/xiazhu_item"
                     android:id="@+id/item_h"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="76dp"
                     android:layout_weight="1"></include>
 
                 <include
                     layout="@layout/xiazhu_item"
                     android:id="@+id/item_zd"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="76dp"
                     android:layout_weight="1"></include>
             </LinearLayout>
 
@@ -149,14 +149,14 @@
                     layout="@layout/xiazhu_item"
                     android:id="@+id/item_x"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="76dp"
                     android:layout_weight="1"></include>
 
                 <include
                     android:id="@+id/item_z"
                     layout="@layout/xiazhu_item"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="76dp"
                     android:layout_weight="1"></include>
 
             </LinearLayout>
@@ -188,7 +188,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+
         android:orientation="horizontal">
         <android.support.v7.widget.RecyclerView
             android:layout_width="wrap_content"

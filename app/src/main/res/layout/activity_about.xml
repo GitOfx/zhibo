@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#f0eeee"
     android:orientation="vertical"
-    tools:context="com.yiren.live.own.setting.AboutActivity">
+    tools:context="com.live.xue.own.setting.AboutActivity">
 
     <include layout="@layout/layout_top"/>
 <LinearLayout

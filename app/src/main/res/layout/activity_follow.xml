@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#f0eeee"
-    tools:context="com.yiren.live.own.follow.FollowActivity">
+    tools:context="com.live.xue.own.follow.FollowActivity">
 
     <include layout="@layout/layout_top"/>
 

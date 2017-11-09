@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical">
+
+    <include layout="@layout/game_dou_head">
+    </include>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="80dp"
+            android:id="@+id/ll_content_right"
+            android:layout_alignParentRight="true"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:id="@+id/ll_c10"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_c10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/c_10" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_c50"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_c50"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/c_50" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_c100"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_c100"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/c_100" />
+            </LinearLayout>
+        </LinearLayout>
+        <!--左边一大块-->
+        <LinearLayout
+            android:id="@+id/ll_content_left"
+            android:layout_toLeftOf="@id/ll_content_right"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:orientation="horizontal">
+                <!--直播区-->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+                    <android.opengl.GLSurfaceView
+                        android:id="@+id/camera_preview"
+                        android:layout_width="2dp"
+                        android:layout_height="3dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentTop="true"/>
+                    <SurfaceView
+                        android:id="@+id/player_surface"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"/>
+                </RelativeLayout>
+                <!--下注区-->
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="160dp">
+
+                        <include
+                            android:id="@+id/item_l"
+                            layout="@layout/xiazhu_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"></include>
+
+                        <include
+                            layout="@layout/xiazhu_item"
+                            android:id="@+id/item_h"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"></include>
+
+                        <include
+                            layout="@layout/xiazhu_item"
+                            android:id="@+id/item_hu"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"></include>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal">
+                        <Button
+                            android:id="@+id/btn_confirm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_margin="5dp"
+                            android:background="#02AC01"
+                            android:text="确定"/>
+                        <Button
+                            android:id="@+id/btn_cancel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:background="@color/lcim_commom_read"
+                            android:layout_weight="1"
+                            android:text="取消"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:orientation="horizontal">
+                <android.support.v7.widget.RecyclerView
+                    android:layout_width="wrap_content"
+                    android:id="@+id/rv_game_left"
+                    android:background="@color/color_f3dd1e"
+                    android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+
+                <android.support.v7.widget.RecyclerView
+                    android:layout_width="wrap_content"
+                    android:id="@+id/rv_game_right"
+                    android:background="@color/color_f3dd1e"
+                    android:layout_marginLeft="3dp"
+                    android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!--投注-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="185dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <include
+                    android:id="@+id/item_xd"
+                    layout="@layout/xiazhu_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="76dp"
+                    android:layout_weight="1"></include>
+
+                <include
+                    layout="@layout/xiazhu_item"
+                    android:id="@+id/item_h"
+                    android:layout_width="match_parent"
+                    android:layout_height="76dp"
+                    android:layout_weight="1"></include>
+
+                <include
+                    layout="@layout/xiazhu_item"
+                    android:id="@+id/item_zd"
+                    android:layout_width="match_parent"
+                    android:layout_height="76dp"
+                    android:layout_weight="1"></include>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/xiazhu_item"
+                    android:id="@+id/item_x"
+                    android:layout_width="match_parent"
+                    android:layout_height="76dp"
+                    android:layout_weight="1"></include>
+
+                <include
+                    android:id="@+id/item_z"
+                    layout="@layout/xiazhu_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="76dp"
+                    android:layout_weight="1"></include>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

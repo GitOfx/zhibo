@@ -32,7 +32,7 @@
             android:layout_weight="1"
             app:tabIndicatorColor="@color/white"
             app:tabIndicatorHeight="2.6dp"
-            app:tabMode="fixed"
+             app:tabMode="scrollable"
             app:tabPadding="2dp"
 
             app:tabSelectedTextColor="@color/white"

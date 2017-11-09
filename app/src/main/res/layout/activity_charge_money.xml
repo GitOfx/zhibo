@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/divider_color"
     android:orientation="vertical"
-    tools:context="com.yiren.live.own.money.ChargeMoneyActivity">
+    tools:context="com.live.xue.own.money.ChargeMoneyActivity">
 
     <!--<include layout="@layout/layout_top"/>-->
 

@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true" />
-        <com.yiren.live.living.CameraHintView
+        <com.live.xue.living.CameraHintView
             android:id="@+id/camera_hint"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

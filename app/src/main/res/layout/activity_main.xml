@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yiren.live.MainActivity">
+    tools:context="com.live.xue.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,14 +14,14 @@
 
         <fragment
             android:id="@+id/fragment_home"
-            android:name="com.yiren.live.home.fragment.HomeFragment"
+            android:name="com.live.xue.home.fragment.HomeFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
         <fragment
             android:id="@+id/fragment_own"
-            android:name="com.yiren.live.own.OwnFragment"
+            android:name="com.live.xue.own.OwnFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>

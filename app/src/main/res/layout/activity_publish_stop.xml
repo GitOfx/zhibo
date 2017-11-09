@@ -6,7 +6,7 @@
     android:background="@drawable/liveend"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="com.yiren.live.living.PublishStopActivity">
+    tools:context="com.live.xue.living.PublishStopActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

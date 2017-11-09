@@ -39,11 +39,11 @@
         android:layout_height="0.5dp"
         android:background="@color/divider_color_alpha" />
 
-    <com.yiren.live.view.GiftViewPager
+    <com.live.xue.view.GiftViewPager
         android:id="@+id/gift_viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"></com.yiren.live.view.GiftViewPager>
+        android:layout_weight="1"></com.live.xue.view.GiftViewPager>
 
     <RelativeLayout
         android:layout_width="match_parent"

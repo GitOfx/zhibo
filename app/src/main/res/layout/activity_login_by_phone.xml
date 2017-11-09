@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg"
     android:orientation="vertical"
-    tools:context="com.yiren.live.login.LoginByPhoneActivity">
+    tools:context="com.live.xue.login.LoginByPhoneActivity">
 
 
     <RelativeLayout

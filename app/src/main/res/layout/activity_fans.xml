@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#f0eeee"
-    tools:context="com.yiren.live.own.fans.FansActivity">
+    tools:context="com.live.xue.own.fans.FansActivity">
 
     <include layout="@layout/layout_top"/>
 

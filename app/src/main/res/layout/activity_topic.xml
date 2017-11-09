@@ -9,14 +9,14 @@
 
     <include layout="@layout/layout_top"/>
 
-        <com.yiren.live.view.RadioGroupEx
+        <com.live.xue.view.RadioGroupEx
             android:id="@+id/radiogroup_term"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
 
-        </com.yiren.live.view.RadioGroupEx>
+        </com.live.xue.view.RadioGroupEx>
 
     <Button
         android:id="@+id/btn_start_living"

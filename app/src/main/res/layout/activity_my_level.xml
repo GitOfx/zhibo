@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.yiren.live.own.level.MyLevelActivity">
+    tools:context="com.live.xue.own.level.MyLevelActivity">
 
     <include layout="@layout/layout_top"/>
     <WebView

@@ -106,7 +106,7 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <com.yiren.live.home.view.CustomSwipeRefreshLayout
+        <com.live.xue.home.view.CustomSwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -115,7 +115,7 @@
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
-        </com.yiren.live.home.view.CustomSwipeRefreshLayout>
+        </com.live.xue.home.view.CustomSwipeRefreshLayout>
 
     </FrameLayout>
 </LinearLayout>

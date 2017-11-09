@@ -129,46 +129,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="闲"
+                android:text="龙"
                 android:lines="1"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/white"
+                android:textColor="@color/color_d6c55a"
                 android:textSize="@dimen/lcim_textsize_normal"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:id="@+id/tv_zhu_x"
+                android:id="@+id/tv_zhu_l"
                 android:gravity="center"
                 android:textSize="@dimen/lcim_textsize_normal"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/color_d6c55a"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="2"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="庄"
-                android:lines="1"
-                android:textColor="@color/white"
-                android:layout_gravity="center_horizontal"
-                android:textSize="@dimen/lcim_textsize_normal"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="0"
-                android:id="@+id/tv_zhu_z"
-                android:gravity="center"
-                android:textSize="@dimen/lcim_textsize_normal"
                 android:textColor="@color/color_d6c55a"/>
         </LinearLayout>
 
@@ -183,18 +157,18 @@
                 android:layout_height="wrap_content"
                 android:text="和"
                 android:lines="1"
+                android:textColor="@color/color_d6c55a"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/white"
                 android:textSize="@dimen/lcim_textsize_normal"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:textSize="@dimen/lcim_textsize_normal"
+                android:text="0"
                 android:id="@+id/tv_zhu_h"
+                android:gravity="center"
+                android:textSize="@dimen/lcim_textsize_normal"
                 android:textColor="@color/color_d6c55a"/>
         </LinearLayout>
 
@@ -207,47 +181,25 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="闲对"
+                android:text="虎"
                 android:lines="1"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/white"
+                android:textColor="@color/color_d6c55a"
                 android:textSize="@dimen/lcim_textsize_normal"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
+                android:gravity="center"
                 android:textSize="@dimen/lcim_textsize_normal"
-                android:id="@+id/tv_zhu_xd"
+                android:id="@+id/tv_zhu_hu"
                 android:textColor="@color/color_d6c55a"/>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="2"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="庄对"
-                android:lines="1"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/white"
-                android:textSize="@dimen/lcim_textsize_normal"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:gravity="center"
-                android:id="@+id/tv_zhu_zd"
-                android:textSize="@dimen/lcim_textsize_normal"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/color_d6c55a"/>
-        </LinearLayout>
+
+
+
     </LinearLayout>
 </LinearLayout>

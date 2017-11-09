@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="20dp"
-    android:background="#FEEECA"
-    android:layout_height="20dp">
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+
+    <RelativeLayout
+        android:layout_width="15dp"
+        android:background="#FEEECA"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_height="15dp">
+
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,6 +23,8 @@
         android:text="1"
         android:textColor="@color/color_00ba00"
         android:textStyle="bold"
+        android:includeFontPadding="false"
         android:layout_centerInParent="true"
         android:id="@+id/tv_num"/>
+    </RelativeLayout>
 </RelativeLayout>
