@@ -23,6 +23,7 @@ public class GameLeftAdapter extends RecyclerView.Adapter {
     int rowCount = 0;
     int coloumCount = 0;
     List<String> record = new ArrayList<>();
+    public boolean isDraon = false;
     public GameLeftAdapter(List<List<String>> recordListList){
         //先找出最长的一排
         record.clear();
@@ -125,6 +126,19 @@ public class GameLeftAdapter extends RecyclerView.Adapter {
      zzdxd：庄庄对闲对
      * */
     private int getItemResId(String item){
+
+        if (isDraon){//z龙，x虎，h和
+            if ("x".equals(item)){
+                return R.drawable.hu_dou;
+            }else if ("z".equals(item)){
+                return R.drawable.longg;
+            }else if ("h".equals(item)){
+                return R.drawable.h;
+            }else {
+                return 0;
+            }
+//            return ;
+        }
 
         if ("x".equals(item)){
             return R.drawable.x;

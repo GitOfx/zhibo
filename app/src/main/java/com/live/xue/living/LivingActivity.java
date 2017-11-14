@@ -1301,14 +1301,25 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
 //        }
 
 
-//        if ("longhu".equals(type)) {
-//            tv_baijiale.setText("龙虎斗");
-//        }else if ("bai".equals(type)){
-//            tv_baijiale.setText("百家乐");
-//        }else {
-//            tv_baijiale.setVisibility(View.GONE);
-//        }
+        if ("9".equals(mVideoItem.getCharge_type())) {
+            tv_baijiale.setText("龙虎斗");
+        }else if ("8".equals(mVideoItem.getCharge_type())){
+            tv_baijiale.setText("百家乐");
+        }else {
+            tv_baijiale.setVisibility(View.GONE);
+        }
 
+        if (Logs.isDebug) {
+            tv_baijiale.setVisibility(View.VISIBLE);
+            if (mVideoItem.getUser_nicename().contains("龙虎")) {
+                mVideoItem.setCharge_type("9");
+                tv_baijiale.setText("龙虎斗");
+            } else {
+                mVideoItem.setCharge_type("8");
+                tv_baijiale.setText("百家乐");
+            }
+        }
+        Logs.e(mVideoItem.toString());
         String roomPassword = data.getString("password");
         token = (String) SharePrefsUtils.get(this, "user", "token", "");
         userId = (String) SharePrefsUtils.get(this, "user", "userId", "");
@@ -2627,10 +2638,10 @@ public class LivingActivity extends BaseActivity implements TextureView.SurfaceT
         bundle.putString("gameid","");
         bundle.putString("hostid",channel_creater);
         bundle.putString("roomid", channelInfo.getString("room_id"));
-        if ("longhu".equals(type)){
+        if ("9".equals(mVideoItem.getCharge_type())){
             bundle.putSerializable("videoItem", mVideoItem);
             openActivity(GameLongHuActivity.class,bundle);
-        }else {
+        }else if ("8".equals(mVideoItem.getCharge_type())){
             openActivity(GameActivity.class,bundle);
         }
     }

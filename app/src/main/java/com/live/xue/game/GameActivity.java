@@ -583,13 +583,13 @@ public class GameActivity extends BaseActivity {
         String  z  = data.getString("z");
         ((TextView) item_z.findViewById(R.id.tv_score)).setText("1:"+z);
         String  x  = data.getString("x");
-        ((TextView) item_z.findViewById(R.id.tv_score)).setText("1:"+x);
+        ((TextView) item_x.findViewById(R.id.tv_score)).setText("1:"+x);
         String  h  = data.getString("h");
-        ((TextView) item_z.findViewById(R.id.tv_score)).setText("1:"+h);
+        ((TextView) item_h.findViewById(R.id.tv_score)).setText("1:"+h);
         String  zd  = data.getString("zd");
-        ((TextView) item_z.findViewById(R.id.tv_score)).setText("1:"+zd);
+        ((TextView) item_zd.findViewById(R.id.tv_score)).setText("1:"+zd);
         String  xd = data.getString("xd");
-        ((TextView) item_z.findViewById(R.id.tv_score)).setText("1:"+xd);
+        ((TextView) item_xd.findViewById(R.id.tv_score)).setText("1:"+xd);
 
 
     }

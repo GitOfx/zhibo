@@ -183,14 +183,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_margin="3dp"
+                    android:layout_margin="2dp"
                     android:background="#02AC01"
                     android:text="确定"/>
                 <Button
                     android:id="@+id/btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="3dp"
+                    android:layout_margin="2dp"
                     android:background="@color/lcim_commom_read"
                     android:layout_weight="1"
                     android:text="取消"/>
