@@ -11,17 +11,26 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:weightSum="5"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:orientation="horizontal"
+         >
         <!--c筹码-->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="185dp"
+            android:layout_height="match_parent"
             android:orientation="vertical">
             <!--第一排-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="92dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -65,7 +74,8 @@
             <!--第一排-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="92dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -110,53 +120,55 @@
         <!--投注-->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="185dp"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <include
                     android:id="@+id/item_xd"
                     layout="@layout/xiazhu_item"
                     android:layout_width="match_parent"
-                    android:layout_height="76dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"></include>
 
                 <include
                     layout="@layout/xiazhu_item"
                     android:id="@+id/item_h"
                     android:layout_width="match_parent"
-                    android:layout_height="76dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"></include>
 
                 <include
                     layout="@layout/xiazhu_item"
                     android:id="@+id/item_zd"
                     android:layout_width="match_parent"
-                    android:layout_height="76dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"></include>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <include
                     layout="@layout/xiazhu_item"
                     android:id="@+id/item_x"
                     android:layout_width="match_parent"
-                    android:layout_height="76dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"></include>
 
                 <include
                     android:id="@+id/item_z"
                     layout="@layout/xiazhu_item"
                     android:layout_width="match_parent"
-                    android:layout_height="76dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"></include>
 
             </LinearLayout>
@@ -171,14 +183,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_margin="5dp"
+                    android:layout_margin="3dp"
                     android:background="#02AC01"
                     android:text="确定"/>
                 <Button
                     android:id="@+id/btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
+                    android:layout_margin="3dp"
                     android:background="@color/lcim_commom_read"
                     android:layout_weight="1"
                     android:text="取消"/>
@@ -188,8 +200,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:id="@+id/ll_recycle"
         android:orientation="horizontal">
         <android.support.v7.widget.RecyclerView
             android:layout_width="wrap_content"
@@ -203,5 +216,7 @@
             android:background="@color/color_f3dd1e"
             android:layout_marginLeft="3dp"
             android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
-            android:layout_width="80dp"
+            android:layout_width="60dp"
             android:id="@+id/ll_content_right"
             android:layout_alignParentRight="true"
             android:layout_height="match_parent"
@@ -21,10 +21,12 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:id="@+id/ll_c10"
-                android:layout_height="wrap_content">
+                android:layout_weight="1"
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/iv_c10"
+                    android:layout_marginTop="1dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/c_10" />
@@ -33,10 +35,12 @@
             <LinearLayout
                 android:id="@+id/ll_c50"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_weight="1"
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/iv_c50"
+                    android:layout_marginTop="1dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/c_50" />
@@ -45,13 +49,56 @@
             <LinearLayout
                 android:id="@+id/ll_c100"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_weight="1"
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/iv_c100"
+                    android:layout_marginTop="1dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/c_100" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_c500"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_c500"
+                    android:layout_marginTop="1dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/c_500" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_c1000"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_c1000"
+                    android:layout_marginTop="1dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/c_1000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_c10000"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_c10000"
+                    android:layout_marginTop="1dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/c_10000" />
             </LinearLayout>
         </LinearLayout>
         <!--左边一大块-->
@@ -161,67 +208,6 @@
         </LinearLayout>
 
     </RelativeLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
-        <!--投注-->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="185dp"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <include
-                    android:id="@+id/item_xd"
-                    layout="@layout/xiazhu_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="76dp"
-                    android:layout_weight="1"></include>
-
-                <include
-                    layout="@layout/xiazhu_item"
-                    android:id="@+id/item_h"
-                    android:layout_width="match_parent"
-                    android:layout_height="76dp"
-                    android:layout_weight="1"></include>
-
-                <include
-                    layout="@layout/xiazhu_item"
-                    android:id="@+id/item_zd"
-                    android:layout_width="match_parent"
-                    android:layout_height="76dp"
-                    android:layout_weight="1"></include>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <include
-                    layout="@layout/xiazhu_item"
-                    android:id="@+id/item_x"
-                    android:layout_width="match_parent"
-                    android:layout_height="76dp"
-                    android:layout_weight="1"></include>
-
-                <include
-                    android:id="@+id/item_z"
-                    layout="@layout/xiazhu_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="76dp"
-                    android:layout_weight="1"></include>
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-    </LinearLayout>
 
 </LinearLayout>
